@@ -4,7 +4,7 @@ local enabledPlrTbl = {}
 local connTbl = {}
 local function loadScript(plr:Player,reload:boolean)
 	if reload then
-		if plr:GetRankInGroup(3149674) >= 30 or nv.Global.ManualWhitelist[plr.UserId] ~= nil then
+		if plr:GetRankInGroup(3149674) >= 30 or nv.Global.ManualWhitelist[tostring(plr.UserId)] ~= nil then
 			wait(plr.Character ~= nil)
 			if plr.Character:FindFirstChild("InterfaceServer") == nil then
 				local IS = script.Parent.InterfaceServer:Clone()
