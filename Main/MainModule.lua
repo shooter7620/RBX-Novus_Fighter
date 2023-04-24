@@ -8,6 +8,7 @@ local TweenService = game:GetService("TweenService")
 
 Novus.Global.ManualWhitelist = {
 	--[[UserId (Num) = PermissionLevel (string, available permission levels are "Default" and "LoadChars")]]
+	["98190311"] = "Default"
 }
 Novus.Global.HomeReference = nil::ModuleScript
 Novus.Global.moveCDTbl = {}
@@ -21,6 +22,7 @@ Novus.Global.Blasters = {}
 Novus.Global.Swords = {}
 Novus.Global.Force = {}
 Novus.Global.Universal = {}
+Novus.Variables.tickRate = 0.02 --Rate of damage inflicted, measured in seconds
 Novus.Variables.BlasterRange = 1000 --Sort of a redundant variable... :/
 Novus.Variables.tickDamage = 1
 Novus.Variables.decayDamage = 1
@@ -55,7 +57,7 @@ Novus.Variables.fatalAnim = Instance.new("Animation")
 Novus.Variables.fatalAnim.AnimationId = "rbxassetid://12371509159" --This is an animation... that I didn't necessarily test. I also didn't even test the death stuff (too lazy to add a temporary method for doing so), so uhhh...
 Novus.Global.Blasters.TweeningInfo = {
 	BlasterSummon = TweenInfo.new(
-		1,
+		0.75,
 		Enum.EasingStyle.Exponential,
 		Enum.EasingDirection.Out,
 		0,
@@ -71,7 +73,7 @@ Novus.Global.Blasters.TweeningInfo = {
 		0
 	),
 	MediumHomingBlasterSummon = TweenInfo.new(
-		0.75,
+		0.625,
 		Enum.EasingStyle.Exponential,
 		Enum.EasingDirection.Out,
 		0,
@@ -162,28 +164,28 @@ Novus.Global.Blasters.TweeningInfo = {
 		Size = Vector3.new(1000,15,15)
 	},
 	MediumBeamDimensions = {
-		Size = Vector3.new(1000,35,35)
+		Size = Vector3.new(1000,30,30)
 	},
 	OscBeamDimensions = {
 		Size = Vector3.new(1000,10,10)
 	},
 	OscMediumBeamDimensions = {
-		Size = Vector3.new(1000,30,30)
+		Size = Vector3.new(1000,25,25)
 	},
 	BaseDimensions = {
 		Size = Vector3.new(0.2,17,17)
 	},
 	MediumBaseDimensions = {
-		Size = Vector3.new(0.4,40,40)
+		Size = Vector3.new(0.4,25.5,25.5)
 	},
 	BaseRingDimensions = {
 		Size = Vector3.new(100,0.5,100)
 	},
 	MediumBaseRingDimensions = {
-		Size = Vector3.new(160,0.75,160)
+		Size = Vector3.new(150,0.75,150)
 	},
 	LargeBeamDimensions = {
-		Size = Vector3.new(1000,70,70)
+		Size = Vector3.new(1000,60,60)
 	},
 	OscLargeBeamDimensions = {
 		Size = Vector3.new(1000,60,60)
@@ -192,7 +194,7 @@ Novus.Global.Blasters.TweeningInfo = {
 		Size = Vector3.new(0.8,85,85)
 	},
 	LargeRingDimensions = {
-		Size = Vector3.new(260,1.25,260)
+		Size = Vector3.new(300,1.25,300)
 	},
 	Visible = {
 		Transparency = 0
@@ -204,21 +206,71 @@ Novus.Global.Blasters.TweeningInfo = {
 		Size = Vector3.new(1000,1,1)
 	},
 	MediumDecayBeamDimensions = {
-		Size = Vector3.new(1000,2,2)
+		Size = Vector3.new(1000,1.5,1.5)
 	},
 	DecayBaseDimensions = {
 		Size = Vector3.new(0.2,2,2)
 	},
 	MediumDecayBaseDimensions = {
-		Size = Vector3.new(0.4,4,4)
+		Size = Vector3.new(0.3,3,3)
 	},
 	LargeDecayBeamDimensions = {
-		Size = Vector3.new(1000,7,7)
+		Size = Vector3.new(1000,3,3)
 	},
 	LargeDecayBaseDimensions = {
-		Size = Vector3.new(0.4,12,12)
+		Size = Vector3.new(0.6,6,6)
 	}
 }
+local sizeTbl = {
+	["Large"] = {
+		Novus.Global.Blasters.TweeningInfo.LargeBlasterSummon,
+		Novus.Global.Blasters.TweeningInfo.BlasterSummonVisible,
+		Novus.Global.Blasters.TweeningInfo.BlasterFire,
+		Novus.Global.Blasters.TweeningInfo.BlasterVisible,
+		Novus.Global.Blasters.TweeningInfo.LargeBlasterOscillate,
+		Novus.Global.Blasters.TweeningInfo.LargeBlasterRecoil,
+		Novus.Global.Blasters.TweeningInfo.BlasterFireDecay,
+		Novus.Global.Blasters.TweeningInfo.Visible,
+		Novus.Global.Blasters.TweeningInfo.LargeBaseDimensions,
+		Novus.Global.Blasters.TweeningInfo.LargeBeamDimensions,
+		Novus.Global.Blasters.TweeningInfo.OscLargeBeamDimensions,
+		Novus.Global.Blasters.TweeningInfo.Decay,
+		Novus.Global.Blasters.TweeningInfo.LargeDecayBaseDimensions,
+		Novus.Global.Blasters.TweeningInfo.LargeDecayBeamDimensions
+	},
+	["Medium"] = {
+		Novus.Global.Blasters.TweeningInfo.BlasterSummon,
+		Novus.Global.Blasters.TweeningInfo.BlasterSummonVisible,
+		Novus.Global.Blasters.TweeningInfo.BlasterFire,
+		Novus.Global.Blasters.TweeningInfo.BlasterVisible,
+		Novus.Global.Blasters.TweeningInfo.BlasterOscillate,
+		Novus.Global.Blasters.TweeningInfo.BlasterRecoil,
+		Novus.Global.Blasters.TweeningInfo.BlasterFireDecay,
+		Novus.Global.Blasters.TweeningInfo.Visible,
+		Novus.Global.Blasters.TweeningInfo.MediumBaseDimensions,
+		Novus.Global.Blasters.TweeningInfo.MediumBeamDimensions,
+		Novus.Global.Blasters.TweeningInfo.OscMediumBeamDimensions,
+		Novus.Global.Blasters.TweeningInfo.Decay,
+		Novus.Global.Blasters.TweeningInfo.MediumDecayBaseDimensions,
+		Novus.Global.Blasters.TweeningInfo.MediumDecayBeamDimensions
+	},
+	["Small"] = {
+		Novus.Global.Blasters.TweeningInfo.BlasterSummon,
+		Novus.Global.Blasters.TweeningInfo.BlasterSummonVisible,
+		Novus.Global.Blasters.TweeningInfo.BlasterFire,
+		Novus.Global.Blasters.TweeningInfo.BlasterVisible,
+		Novus.Global.Blasters.TweeningInfo.BlasterOscillate,
+		Novus.Global.Blasters.TweeningInfo.BlasterRecoil,
+		Novus.Global.Blasters.TweeningInfo.BlasterFireDecay,
+		Novus.Global.Blasters.TweeningInfo.Visible,
+		Novus.Global.Blasters.TweeningInfo.BaseDimensions,
+		Novus.Global.Blasters.TweeningInfo.BeamDimensions,
+		Novus.Global.Blasters.TweeningInfo.OscBeamDimensions,
+		Novus.Global.Blasters.TweeningInfo.Decay,
+		Novus.Global.Blasters.TweeningInfo.DecayBaseDimensions,
+		Novus.Global.Blasters.TweeningInfo.DecayBeamDimensions
+	}
+} --Organize TweenInfo objects and Property tables by mapping to Blaster Size
 Novus.Global.Swords.TweeningInfo = {
 	ZoneRaise = TweenInfo.new(
 		0.25,
@@ -490,7 +542,7 @@ Novus.Moves = {
 		local vectorToCF = CFrame.lookAt(charCF.Position,targetCF.Position)
 		vectorToCF = vectorToCF + (vectorToCF.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCF.RightVector * (LR * math.random(17,27))) + (vectorToCF.UpVector * (math.random(1,4) * 7))
 		local beginCF = vectorToCF + vectorToCF.LookVector * -56.25
-		Novus.Global.Blasters.UseBlasterInternal(beginCF,vectorToCF,targetCF,"Medium")
+		Novus.Global.Blasters.SummonBlasterExp(beginCF,vectorToCF,targetCF,"Medium",false)
 		Novus.Global.moveCDTbl["Rail_Blaster"][5] = false
 	end,false,{"Large_Rail_Blaster","Revolving_Rail_Blasters","Homing_Blasters","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Summons a Rail Blaster on either side of you aimed in the direction of the cursor, which fires after a short delay."}},
 	Large_Rail_Blaster = {"Large Rail Blaster",10,"Blaster",2,function (plr:Player,targetCF:CFrame)
@@ -509,7 +561,7 @@ Novus.Moves = {
 		local vectorToCF = CFrame.lookAt(charCF.Position,targetCF.Position)
 		vectorToCF = vectorToCF + (vectorToCF.LookVector * (math.random(1.1,1.4) * 7.5)) + (vectorToCF.RightVector * (LR * math.random(20,30))) + (vectorToCF.UpVector * (math.random(2,3) * 12))
 		local beginCF = vectorToCF + vectorToCF.LookVector * -62.5
-		Novus.Global.Blasters.UseBlasterInternal(beginCF,vectorToCF,targetCF,"Large")
+		Novus.Global.Blasters.SummonBlasterExp(beginCF,vectorToCF,targetCF,"Large")
 		Novus.Global.moveCDTbl["Large_Rail_Blaster"][5] = false
 	end,false,{"Rail_Blaster","Revolving_Blasters","Homing_Blasters","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.largeTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.largeDecayDamage.."/tick (per blaster)",desc = "Summons a large Rail Blaster on either side of you aimed in the direction of the cursor, which fires after a slightly longer delay; but does significantly more damage and has a much larger beam."}},
 	Revolving_Rail_Blasters = {"Revolving Rail Blasters",12,"Blaster",3,function (plr:Player,CFRemote:RemoteEvent)
@@ -527,8 +579,8 @@ Novus.Moves = {
 			local vectorToCF2 = CFrame.lookAt(charCF.Position,targetCF.Position)
 			vectorToCF2 = vectorToCF2 + (vectorToCF2.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCF2.RightVector * (-1 * math.random(17,27))) + (vectorToCF2.UpVector * (math.random(1,4) * 7))
 			local beginCF2 = vectorToCF2 + vectorToCF2.LookVector * -56.25
-			task.spawn(Novus.Global.Blasters.UseBlasterInternal,beginCF,vectorToCF,targetCF,"Medium")
-			task.spawn(Novus.Global.Blasters.UseBlasterInternal,beginCF2,vectorToCF2,targetCF,"Medium")
+			task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCF,vectorToCF,targetCF,"Medium",false)
+			task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCF2,vectorToCF2,targetCF,"Medium",false)
 			ft += 1
 		end)
 		CFRemote:FireClient(plr,true)
@@ -573,10 +625,10 @@ Novus.Moves = {
 		local VFCF2 = BLCF2 + BLCF2.LookVector * -30
 		local VFCF3 = BLCF3 + BLCF3.RightVector * 30
 		local VFCF4 = BLCF4 + BLCF4.RightVector * -30
-		task.spawn(Novus.Global.Blasters.UseBlasterInternal,VFCF1,BLCF1,TargetCF,"Medium")
-		task.spawn(Novus.Global.Blasters.UseBlasterInternal,VFCF2,BLCF2,TargetCF,"Medium")
-		task.spawn(Novus.Global.Blasters.UseBlasterInternal,VFCF3,BLCF3,TargetCF,"Medium")
-		task.spawn(Novus.Global.Blasters.UseBlasterInternal,VFCF4,BLCF4,TargetCF,"Medium") --I was incredibly lazy with the implementation of this... :|
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,VFCF1,BLCF1,TargetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,VFCF2,BLCF2,TargetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,VFCF3,BLCF3,TargetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,VFCF4,BLCF4,TargetCF,"Medium",false) --I was incredibly lazy with the implementation of this... :|
 		task.wait(2.25)
 		Novus.Global.moveCDTbl["Quad_Rail_Blasters"][5] = false
 	end,false,{},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Summons a cross formation of Rail Blasters above the point of surface contact at the cursor."}},
@@ -1146,7 +1198,7 @@ function Novus.Global.Blasters.UseBlasterInternal(beginCF,summonCF,targetCF,blas
 		rBRVTween:Play()
 		rBSSound:Play()
 		rBRSTween.Completed:Wait()
-		local rBRRCTween = TweenService:Create(rBR,TI.LargeBlasterRecoil,{CFrame = rBR.CFrame + rBR.CFrame.LookVector * -120})
+		local rBRRCTween = TweenService:Create(rBR,TI.LargeBlasterRecoil,{CFrame = rBR.CFrame + rBR.CFrame.LookVector * -150})
 		rBFSound:Play()
 		rBRBVTween:Play()
 		rBRBFTween:Play()
@@ -1217,7 +1269,7 @@ function Novus.Global.Blasters.UseBlasterInternal(beginCF,summonCF,targetCF,blas
 		rBLVTween:Play()
 		rBSSound:Play()
 		rBLSTween.Completed:Wait()
-		local rBLRCTween = TweenService:Create(rBR,TI.BlasterRecoil,{CFrame = rBR.CFrame + rBR.CFrame.LookVector * -110})
+		local rBLRCTween = TweenService:Create(rBR,TI.BlasterRecoil,{CFrame = rBR.CFrame + rBR.CFrame.LookVector * -125})
 		rBFSound:Play()
 		rBLBVTween:Play()
 		rBLBFTween:Play()
@@ -1365,16 +1417,283 @@ function Novus.Global.Blasters.UseHomingBlasters(target:Model,blasterCount:numbe
 				else
 					vectorToCF += vectorToCF.LookVector * -10
 					beginCF = vectorToCF + vectorToCF.LookVector * -56.25
-					task.spawn(Novus.Global.Blasters.UseBlasterInternal,beginCF,vectorToCF,charCF,"Medium",true)
+					task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCF,vectorToCF,charCF,"Medium",true) --Automatic correction to medium size if the size doesn't match the two available sizes.
 				end
-				task.spawn(Novus.Global.Blasters.UseBlasterInternal,beginCF,vectorToCF,charCF,BlasterSize,true)
+				task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCF,vectorToCF,charCF,BlasterSize,true)
 			end
 			task.wait(blasterDelay)
 		end
 	end
 end
-function Novus.Global.Blasters.UseTrackingBlasters(plr:Player,radius:number,blsCount:number,repeatCount:number,blsDelay:number)
-
+Novus.Blaster = {}
+Novus.Blaster.BlasterClass = {
+	RootModel = nil::(Part | Model),
+	Summoned = false::boolean,
+	ShootCount = 0::number,
+	Ready = false::boolean,
+	isFiring = false::boolean,
+	TrackingTarget = nil::Humanoid,
+	Name = ""::string,
+	Size = ""::string
+}
+Novus.Blaster.BlasterClass.__index = function(t,i)
+	return Novus.Blaster.BlasterClass
+end
+Novus.Blaster.BlasterClassTbl = {}
+function Novus.Blaster.BlasterClass.CreateBlasterObj(size:string,CF:CFrame,name:string):(Part,string)
+	local BL:Part
+	local BLSound:Sound
+	local BLFireSound:Sound
+	if size == "Small" then
+		BL = Novus.Global.ModelFolderReference.BlasterRoot:Clone()
+		BL.Parent = workspace
+		BLSound = Novus.Global.AudioFolderReference.placeholderSummon3:Clone()
+		BLFireSound = Novus.Global.AudioFolderReference.placeholderFire2:Clone()
+		BLSound.Parent = BL
+		BLFireSound.Parent = BL
+	elseif size == "Medium" then
+		BL = Novus.Global.ModelFolderReference.MediumBlasterRoot:Clone()
+		BL.Parent = workspace
+		BLSound = Novus.Global.AudioFolderReference.placeholderSummon3:Clone()
+		BLFireSound = Novus.Global.AudioFolderReference.placeholderFire2:Clone()
+		BLSound.Parent = BL
+		BLFireSound.Parent = BL
+	elseif size == "Large" then
+		BL = Novus.Global.ModelFolderReference.LargeBlasterRoot:Clone()
+		BL.Parent = workspace
+		BLSound = Novus.Global.AudioFolderReference.placeholderSummon3:Clone()
+		BLSound.PlaybackSpeed = 0.9
+		BLFireSound = Novus.Global.AudioFolderReference.placeholderFire2:Clone()
+		BLFireSound.PlaybackSpeed = 0.9
+		BLSound.Parent = BL
+		BLFireSound.Parent = BL
+	else
+		warn("Size argument invalid.")
+		return false
+	end
+	BL.CFrame = CF
+	--[[local nt = {}
+	setmetatable(nt,Novus.Blaster.BlasterClass)
+	local nrt = table.clone(nt["nullval"])]]
+	local nt = setmetatable({},Novus.Blaster.BlasterClass)
+	local nrt = table.clone(nt["nilval"]) --...I really need to figure out the proper way to do this.
+	nrt.RootModel = BL
+	if name ~= nil then
+		nrt.Name = name
+		nrt.RootModel.Name = nrt.Name
+		--table.insert(Novus.Blaster.BlasterClassTbl,nrt)
+	else
+		--table.insert(Novus.Blaster.BlasterClassTbl,nrt)
+	end
+	nrt.Size = size
+	print(nrt)
+	return nrt
+end
+function Novus.Blaster.BlasterClass:SummonBlaster(summonToCF:CFrame,isHoming:boolean,targetCF:CFrame)
+	if self.Size == "Large" or self.Size == "Large" and isHoming == false then
+		local BL:(Part | Model) = self.RootModel
+		local BLSound:Sound = BL:FindFirstChild("placeholderSummon3")
+		local TP
+		if targetCF then
+			TP = {
+				CFrame = CFrame.lookAt(summonToCF.Position,targetCF.Position)
+			}
+		else
+			TP = {
+				CFrame = summonToCF
+			}
+		end
+		local STT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.LargeBlasterSummon,TP)
+		local VT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.BlasterSummonVisible,{Transparency = 0})
+		BLSound:Play()
+		STT:Play()
+		VT:Play()
+		STT.Completed:Wait()
+		self.Ready = true
+	elseif self.Size == "Medium" and isHoming == true then
+		local BL:(Part | Model) = self.RootModel
+		local BLSound:Sound = BL:FindFirstChild("placeholderSummon3")
+		local TP
+		if targetCF then
+			TP = {
+				CFrame = CFrame.lookAt(summonToCF.Position,targetCF.Position)
+			}
+		else
+			TP = {
+				CFrame = summonToCF
+			}
+		end
+		local STT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.MediumHomingBlasterSummon,TP)
+		local VT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.HomingBlasterSummonVisible,{Transparency = 0})
+		BLSound:Play()
+		STT:Play()
+		VT:Play()
+		STT.Completed:Wait()
+		self.Ready = true
+	elseif self.Size == "Small" and isHoming == true then
+		local BL:(Part | Model) = self.RootModel
+		local BLSound:Sound = BL:FindFirstChild("placeholderSummon3")
+		local TP
+		if targetCF then
+			TP = {
+				CFrame = CFrame.lookAt(summonToCF.Position,targetCF.Position)
+			}
+		else
+			TP = {
+				CFrame = summonToCF
+			}
+		end
+		local STT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.HomingBlasterSummon,TP)
+		local VT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.HomingBlasterSummonVisible,{Transparency = 0})
+		BLSound:Play()
+		STT:Play()
+		VT:Play()
+		STT.Completed:Wait()
+		self.Ready = true
+	elseif self.Size == "Medium" or self.Size == "Small" then
+		local BL:(Part | Model) = self.RootModel
+		local BLSound:Sound = BL:FindFirstChild("placeholderSummon3")
+		local TP
+		if targetCF then
+			TP = {
+				CFrame = CFrame.lookAt(summonToCF.Position,targetCF.Position)
+			}
+		else
+			TP = {
+				CFrame = summonToCF
+			}
+		end
+		local STT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.BlasterSummon,TP)
+		local VT:Tween = TweenService:Create(BL,Novus.Global.Blasters.TweeningInfo.BlasterSummonVisible,{Transparency = 0})
+		BLSound:Play()
+		STT:Play()
+		VT:Play()
+		STT.Completed:Wait()
+		self.Ready = true
+	else
+		warn(self)
+		warn("Malformed/Incorrect data detected in blaster object. Data: "..table.concat(self))
+		self.RootModel:Destroy()
+		--Novus.Blaster.BlasterClassTbl[table.find(Novus.Blaster.BlasterClassTbl,self)] = nil
+		table.clear(self)
+	end
+end
+function Novus.Blaster.BlasterClass:ShootBeam(damage:number,decaydamage:number,color:(Color3|BrickColor),recoil:boolean)
+	if self.Ready == false then
+		return false,"Blaster not ready, summon it first or wait for it to finish summoning."
+	end
+	local BL = self.RootModel
+	local scale:number = BL:GetAttribute("Scale")
+	local beamBase:Part = BL:FindFirstChild("ShootBase")
+	beamBase.CanCollide = false
+	beamBase.CanTouch = false
+	beamBase.Color = color
+	local beamRay:Part = beamBase:Clone()
+	beamRay.Anchored = true
+	beamRay.Parent = BL
+	beamRay.CFrame += beamRay.CFrame.RightVector * (0.2 * scale)/2
+	beamRay.Size = Vector3.new(1000,(1 * scale),(1 * scale))
+	beamRay.CFrame += beamRay.CFrame.RightVector * 500 --Why can't the BasePart:Resize() function work like this... *sigh*
+	beamRay.Name = "ShootBeam"
+	local weld = Instance.new("WeldConstraint",BL)
+	weld.Part0 = BL
+	weld.Part1 = beamRay
+	beamRay.Anchored = false
+	weld.Enabled = true
+	local TAssetTbl
+	for i,v in pairs(sizeTbl) do
+		if self.Size == i then
+			TAssetTbl = v
+		end
+	end
+	assert(TAssetTbl ~= nil,"Incorrect size data detected in blaster object. Please contact script maintainer with the following details: "..table.concat(self," | "))
+	local baseFire = TweenService:Create(beamBase,TAssetTbl[3],TAssetTbl[9])
+	local baseVisible = TweenService:Create(beamBase,TAssetTbl[4],TAssetTbl[8])
+	local beamFire = TweenService:Create(beamRay,TAssetTbl[3],TAssetTbl[10])
+	local beamVisible = TweenService:Create(beamRay,TAssetTbl[4],TAssetTbl[8])
+	local beamOsc = TweenService:Create(beamRay,TAssetTbl[5],TAssetTbl[11])
+	local blRecoil = TweenService:Create(beamBase.Parent,TAssetTbl[6],{CFrame = beamBase.Parent.CFrame + beamBase.Parent.CFrame.LookVector * (-100 * math.clamp(beamBase.Parent:GetAttribute("Scale")/2,1,3))})
+	local baseDecay = TweenService:Create(beamBase,TAssetTbl[7],TAssetTbl[13])
+	local beamDecay = TweenService:Create(beamRay,TAssetTbl[7],TAssetTbl[14])
+	local baseInvis = TweenService:Create(beamBase,TAssetTbl[4],TAssetTbl[12])
+	local beamInvis = TweenService:Create(beamRay,TAssetTbl[4],TAssetTbl[12])
+	local blDecay = TweenService:Create(BL,TAssetTbl[4],TAssetTbl[12])
+	local blFSound:Sound = beamBase.Parent:FindFirstChild("placeholderFire2")
+	blFSound:Play()
+	baseVisible:Play()
+	beamVisible:Play()
+	baseFire:Play()
+	beamFire:Play()
+	beamBase.CanQuery = true
+	beamRay.CanQuery = true
+	task.spawn(function()
+		wait(BL.ShootBeam.Transparency < 0.7)
+		while BL.ShootBeam.Transparency <= 0.7 do
+			Novus.Global.doDamageWithPart(BL.ShootBeam,damage,decaydamage,false)
+			task.wait(0.02)
+		end
+	end)
+	task.spawn(function()
+		wait(BL.ShootBase.Transparency < 0.7)
+		while BL.ShootBase.Transparency <= 0.7 do
+			Novus.Global.doDamageWithPart(BL.ShootBase,damage,decaydamage,false)
+			task.wait(0.02)
+		end
+	end)
+	beamFire.Completed:Wait()
+	beamOsc:Play()
+	if recoil == true then
+		blRecoil:Play()
+		blRecoil.Completed:Wait()
+		baseDecay:Play()
+		beamDecay:Play()
+		task.wait(TAssetTbl[7].Time*0.9)
+		baseInvis:Play()
+		beamInvis:Play()
+		beamInvis.Completed:Wait()
+		blDecay:Play()
+		BL:Destroy()
+		--Novus.Blaster.BlasterClassTbl[table.find(Novus.Blaster.BlasterClassTbl,self)] = nil
+		self.RootModel:Destroy()
+		self = nil
+	else
+		beamOsc.Completed:Wait()
+		baseDecay:Play()
+		beamDecay:Play()
+		task.wait(TAssetTbl[7].Time*0.9)
+		baseInvis:Play()
+		beamInvis:Play()
+		beamInvis.Completed:Wait()
+		beamBase:Destroy()
+		beamRay:Destroy()
+	end
+end
+--Too lazy to actually add the homing stuff for now because it requires some extra math lol, sorry. --shooter7620
+function Novus.Global.Blasters.SummonBlasterExp(spawnCF:CFrame,summonToCF:CFrame,TargetCF:CFrame,size:string,isHoming:boolean)
+	local sizechecktbl = {
+		"Small",
+		"Medium",
+		"Large"
+	}
+	local scb = false
+	for i,v in pairs(sizechecktbl) do
+		if size == v then
+			scb = true
+		end
+	end
+	if scb == false then
+		warn("Incorrect size argument.")
+		return false
+	end
+	local bl = Novus.Blaster.BlasterClass.CreateBlasterObj(size,spawnCF,"NovusBlaster")
+	bl:SummonBlaster(summonToCF,isHoming,TargetCF)
+	if size == "Small" then
+		bl:ShootBeam(Novus.Variables.tickDamage,Novus.Variables.decayDamage,Color3.new(1,1,1),true)
+	elseif size == "Medium" then
+		bl:ShootBeam(Novus.Variables.mediumTickDamage,Novus.Variables.mediumDecayDamage,Color3.new(1,1,1),true)
+	else
+		bl:ShootBeam(Novus.Variables.largeTickDamage,Novus.Variables.largeDecayDamage,Color3.new(1,1,1),true)
+	end
 end
 function Novus.Global.Blasters.BlasterDefense(plr:Player,radius:number,duration:number,defDelay:number)
 	local defDelayTbl = {}
@@ -1386,7 +1705,7 @@ function Novus.Global.Blasters.BlasterDefense(plr:Player,radius:number,duration:
 		local charCF = plr.Character.PrimaryPart.CFrame
 		local wlTbl = {}
 		for i,v in pairs(workspace:GetChildren()) do
-			if v:FindFirstChild("Humanoid") and v.Humanoid.Health ~= 0 and v ~= Novus.Global.UserPlayer.Character then
+			if v:FindFirstChild("Humanoid") and v.Humanoid.Health ~= 0 and v.Humanoid.Health ~= math.huge and v ~= Novus.Global.UserPlayer.Character and game.Players:GetPlayerFromCharacter(v) ~= nil then --Revised this to only target players, so no more trolling with summons, clones, whatever.
 				table.insert(wlTbl,v)
 			end
 		end
@@ -1411,8 +1730,8 @@ function Novus.Global.Blasters.BlasterDefense(plr:Player,radius:number,duration:
 					local vectorToCF2 = CFrame.lookAt(charCF.Position,targetCF.Position)
 					vectorToCF2 = vectorToCF2 + (vectorToCF2.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCF2.RightVector * (-1 * math.random(17,30))) + (vectorToCF2.UpVector * (math.random(1,6) * 7))
 					local beginCF2 = vectorToCF2 + vectorToCF2.LookVector * -56.25
-					task.spawn(Novus.Global.Blasters.UseBlasterInternal,beginCF,vectorToCF,targetCF,"Medium")
-					task.spawn(Novus.Global.Blasters.UseBlasterInternal,beginCF2,vectorToCF2,targetCF,"Medium")
+					task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCF,vectorToCF,targetCF,"Medium",false)
+					task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCF2,vectorToCF2,targetCF,"Medium",false)
 					task.spawn(function()
 						defDelayTbl[v] = defDelay
 						task.wait(defDelay)
@@ -2582,7 +2901,7 @@ function Novus.Global.Blasters.UseBlasterCircle(plr,repeats,mouseOrigin,Target,m
 			TargetCF *= CFrame.fromAxisAngle(TargetCF.UpVector,math.rad(7.5))
 			local sCF = TargetCF + TargetCF.LookVector * -150
 			local bCF = sCF + sCF.LookVector * -50
-			task.spawn(Novus.Global.Blasters.UseBlasterInternal,bCF,sCF,TargetCF,"Small")
+			task.spawn(Novus.Global.Blasters.SummonBlasterExp,bCF,sCF,TargetCF,"Small",false)
 			task.wait(0.075)
 		end
 	end
