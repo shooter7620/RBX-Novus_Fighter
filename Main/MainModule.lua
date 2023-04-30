@@ -8,7 +8,6 @@ local TweenService = game:GetService("TweenService")
 
 Novus.Global.ManualWhitelist = {
 	--[[UserId (Num) = PermissionLevel (string, available permission levels are "Default" and "LoadChars")]]
-	["98190311"] = "Default"
 }
 Novus.Global.HomeReference = nil::ModuleScript
 Novus.Global.moveCDTbl = {}
@@ -22,7 +21,7 @@ Novus.Global.Blasters = {}
 Novus.Global.Swords = {}
 Novus.Global.Force = {}
 Novus.Global.Universal = {}
-Novus.Variables.tickRate = 0.02 --Rate of damage inflicted, measured in seconds
+Novus.Variables.tickRate = 0.02 --Rate of damage inflicted, measured in seconds. Note that some attacks may have this number reduced, because this is mainly for the blasters.
 Novus.Variables.BlasterRange = 1000 --Sort of a redundant variable... :/
 Novus.Variables.tickDamage = 1
 Novus.Variables.decayDamage = 1
@@ -33,8 +32,8 @@ Novus.Variables.largeDecayDamage = 3
 Novus.Variables.SwordRange = 500
 Novus.Variables.zoneDamage = 1
 Novus.Variables.zoneDecayDamage = 1
-Novus.Variables.throwDamage = 2
-Novus.Variables.throwDecayDamage = 3
+Novus.Variables.throwDamage = 5
+Novus.Variables.throwDecayDamage = 8
 Novus.Variables.wallDamage = 3
 Novus.Variables.wallDecayDamage = 5
 Novus.Variables.forcePushRange = 150
@@ -170,7 +169,7 @@ Novus.Global.Blasters.TweeningInfo = {
 		Size = Vector3.new(1000,10,10)
 	},
 	OscMediumBeamDimensions = {
-		Size = Vector3.new(1000,25,25)
+		Size = Vector3.new(1000,22.5,22.5)
 	},
 	BaseDimensions = {
 		Size = Vector3.new(0.2,17,17)
@@ -188,7 +187,7 @@ Novus.Global.Blasters.TweeningInfo = {
 		Size = Vector3.new(1000,60,60)
 	},
 	OscLargeBeamDimensions = {
-		Size = Vector3.new(1000,60,60)
+		Size = Vector3.new(1000,50,50)
 	},
 	LargeBaseDimensions = {
 		Size = Vector3.new(0.8,85,85)
@@ -592,6 +591,30 @@ Novus.Moves = {
 			Novus.Global.moveCDTbl["Revolving_Rail_Blasters"][5] = false
 		end)
 	end,false,{"Rail_Blaster","Large_Rail_Blaster","Revolving_Rail_Blasters","Homing_Blasters","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Sequentially summons three pairs of two Rail Blasters that fire one after another with a short delay."}},
+	--[[Rail_Blaster_Fusillade = {"Rail Blaster Fusillade",10,"Blaster",9,function (plr:Player,targetCF:CFrame)
+		if plr ~= Novus.Global.UserPlayer then
+			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
+			return false
+		end
+		local charCF = plr.Character.HumanoidRootPart.CFrame
+		local vectorToCFR = CFrame.lookAt(charCF.Position,targetCF.Position)
+		vectorToCFR = vectorToCFR + (vectorToCFR.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCFR.RightVector * (math.random(17,27))) + (vectorToCFR.UpVector * (math.random(1,4) * 7))
+		local beginCFR = vectorToCFR + vectorToCFR.LookVector * -56.25
+		local vectorToCFL = CFrame.lookAt(charCF.Position,targetCF.Position)
+		vectorToCFL = vectorToCFL + (vectorToCFL.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCFL.RightVector * (-1 * math.random(17,27))) + (vectorToCFL.UpVector * (math.random(1,4) * 7))
+		local beginCFL = vectorToCFL + vectorToCFL.LookVector * -56.25
+		local vectorToCFR2,vectorToCFR3 = vectorToCFR + (vectorToCFR.RightVector * 5),vectorToCFR + (vectorToCFR.RightVector * 10)
+		local beginCFR2,beginCFR3 = vectorToCFR2 + (vectorToCFR2.LookVector * -56.25),vectorToCFR3 + (vectorToCFR3.LookVector * -56.25)
+		local vectorToCFL2,vectorToCFL3 = vectorToCFL + (vectorToCFL.RightVector * -5),vectorToCFL + (vectorToCFL.RightVector * -10)
+		local beginCFL2,beginCFL3 = vectorToCFL2 + (vectorToCFL2.LookVector * -56.25),vectorToCFL3 + (vectorToCFL3.LookVector * -56.25)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFR,vectorToCFR,targetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFL,vectorToCFL,targetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFR2,vectorToCFR2,targetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFR3,vectorToCFR3,targetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFL2,vectorToCFL2,targetCF,"Medium",false)
+		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFL3,vectorToCFL3,targetCF,"Medium",false) --...
+	end,false,{"Rail_Blaster","Large_Rail_Blaster","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage,desc = "Summons six blasters in a formation that shoot towards the cursor."}}]]
+	--Will probably add the above in as a replacement for "Revolving Rail Blasters" if I don't find a way to fix the current bug with that move.
 	Quad_Rail_Blasters = {"Quad Rail Blasters",8,"Blaster",4,function (plr:Player,plrCameraOrigin:CFrame,plrMouseTarget:BasePart,plrMouseRay:Ray)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
@@ -1138,7 +1161,7 @@ function Novus.Global.doDecayDamage(hm:Humanoid,healthDmgPercent:number) --NOTE:
 		end
 	end
 end
-function Novus.Global.Blasters.UseBlasterInternal(beginCF,summonCF,targetCF,blasterSize,isHoming)
+--[[function Novus.Global.Blasters.UseBlasterInternal(beginCF,summonCF,targetCF,blasterSize,isHoming)
 	if isHoming == nil then
 		isHoming = false
 	end
@@ -1387,7 +1410,7 @@ function Novus.Global.Blasters.UseBlasterInternal(beginCF,summonCF,targetCF,blas
 		rBLDTween.Completed:Wait()
 		rBR:Destroy()
 	end
-end
+end]]
 function Novus.Global.Blasters.UseHomingBlasters(target:Model,blasterCount:number,BlasterSize:string,blasterDelay:number,fireRepeats:number) --...Desperately needs a rework, or an alternate function. Too prone to performance issues when used in remotely large numbers or the delay is set too low.
 	assert(target:FindFirstChild("Humanoid") ~= nil,"Target must be a character model.")
 	if blasterCount <= 4 then
@@ -1486,7 +1509,6 @@ function Novus.Blaster.BlasterClass.CreateBlasterObj(size:string,CF:CFrame,name:
 		--table.insert(Novus.Blaster.BlasterClassTbl,nrt)
 	end
 	nrt.Size = size
-	print(nrt)
 	return nrt
 end
 function Novus.Blaster.BlasterClass:SummonBlaster(summonToCF:CFrame,isHoming:boolean,targetCF:CFrame)
@@ -1587,9 +1609,13 @@ function Novus.Blaster.BlasterClass:ShootBeam(damage:number,decaydamage:number,c
 	local beamBase:Part = BL:FindFirstChild("ShootBase")
 	beamBase.CanCollide = false
 	beamBase.CanTouch = false
+	beamBase.CanQuery = false
 	beamBase.Color = color
 	local beamRay:Part = beamBase:Clone()
 	beamRay.Anchored = true
+	beamRay.CanCollide = false
+	beamRay.CanTouch = false
+	beamRay.CanQuery = false --For some weird reason, the user's mouse raycasts can still query these parts. I don't know why... too lazy to fix that right now as well, lol.
 	beamRay.Parent = BL
 	beamRay.CFrame += beamRay.CFrame.RightVector * (0.2 * scale)/2
 	beamRay.Size = Vector3.new(1000,(1 * scale),(1 * scale))
@@ -1617,27 +1643,28 @@ function Novus.Blaster.BlasterClass:ShootBeam(damage:number,decaydamage:number,c
 	local beamDecay = TweenService:Create(beamRay,TAssetTbl[7],TAssetTbl[14])
 	local baseInvis = TweenService:Create(beamBase,TAssetTbl[4],TAssetTbl[12])
 	local beamInvis = TweenService:Create(beamRay,TAssetTbl[4],TAssetTbl[12])
-	local blDecay = TweenService:Create(BL,TAssetTbl[4],TAssetTbl[12])
+	local blDecay = TweenService:Create(BL,TAssetTbl[2],TAssetTbl[12])
 	local blFSound:Sound = beamBase.Parent:FindFirstChild("placeholderFire2")
 	blFSound:Play()
 	baseVisible:Play()
 	beamVisible:Play()
 	baseFire:Play()
 	beamFire:Play()
-	beamBase.CanQuery = true
-	beamRay.CanQuery = true
+	--[[beamBase.CanQuery = true
+	beamRay.CanQuery = true]] --"Why are you hitting yourself? Why are you hitting yourself? Why are you hitting yourself?" ...Ugh.
+	local sl = false
 	task.spawn(function()
-		wait(BL.ShootBeam.Transparency < 0.7)
-		while BL.ShootBeam.Transparency <= 0.7 do
+		task.wait(beamFire.TweenInfo.Time/2)
+		while BL.ShootBeam.Transparency < 0.7 and blDecay.PlaybackState ~= Enum.PlaybackState.Playing do
 			Novus.Global.doDamageWithPart(BL.ShootBeam,damage,decaydamage,false)
-			task.wait(0.02)
+			task.wait(Novus.Variables.tickRate)
 		end
 	end)
 	task.spawn(function()
-		wait(BL.ShootBase.Transparency < 0.7)
-		while BL.ShootBase.Transparency <= 0.7 do
+		task.wait(beamFire.TweenInfo.Time/2)
+		while BL.ShootBase.Transparency < 0.7 and blDecay.PlaybackState ~= Enum.PlaybackState.Playing do
 			Novus.Global.doDamageWithPart(BL.ShootBase,damage,decaydamage,false)
-			task.wait(0.02)
+			task.wait(Novus.Variables.tickRate)
 		end
 	end)
 	beamFire.Completed:Wait()
@@ -1647,29 +1674,38 @@ function Novus.Blaster.BlasterClass:ShootBeam(damage:number,decaydamage:number,c
 		blRecoil.Completed:Wait()
 		baseDecay:Play()
 		beamDecay:Play()
-		task.wait(TAssetTbl[7].Time*0.9)
+		task.wait(TAssetTbl[7].Time*0.8)
 		baseInvis:Play()
 		beamInvis:Play()
 		beamInvis.Completed:Wait()
+		if beamDecay.PlaybackState ~= Enum.PlaybackState.Completed then
+			beamDecay.Completed:Wait()
+		end
+		task.wait(0.25)
 		blDecay:Play()
-		BL:Destroy()
 		--Novus.Blaster.BlasterClassTbl[table.find(Novus.Blaster.BlasterClassTbl,self)] = nil
+		sl = true
 		self.RootModel:Destroy()
 		self = nil
 	else
 		beamOsc.Completed:Wait()
 		baseDecay:Play()
 		beamDecay:Play()
-		task.wait(TAssetTbl[7].Time*0.9)
+		task.wait(TAssetTbl[7].Time*0.8)
 		baseInvis:Play()
 		beamInvis:Play()
 		beamInvis.Completed:Wait()
+		if beamDecay.PlaybackState ~= Enum.PlaybackState.Completed then
+			beamDecay.Completed:Wait()
+		end
+		task.wait(0.25)
+		sl = true
 		beamBase:Destroy()
 		beamRay:Destroy()
 	end
 end
 --Too lazy to actually add the homing stuff for now because it requires some extra math lol, sorry. --shooter7620
-function Novus.Global.Blasters.SummonBlasterExp(spawnCF:CFrame,summonToCF:CFrame,TargetCF:CFrame,size:string,isHoming:boolean)
+function Novus.Global.Blasters.SummonBlasterExp(spawnCF:CFrame,summonToCF:CFrame,TargetCF:CFrame,size:string,isHoming:boolean) --Will add in an option at some point for custom damage and beam colors.
 	local sizechecktbl = {
 		"Small",
 		"Medium",
@@ -1691,7 +1727,7 @@ function Novus.Global.Blasters.SummonBlasterExp(spawnCF:CFrame,summonToCF:CFrame
 		bl:ShootBeam(Novus.Variables.tickDamage,Novus.Variables.decayDamage,Color3.new(1,1,1),true)
 	elseif size == "Medium" then
 		bl:ShootBeam(Novus.Variables.mediumTickDamage,Novus.Variables.mediumDecayDamage,Color3.new(1,1,1),true)
-	else
+	else --Kind of tempted to premptively add the functionality I was talking about, but it can wait another day.
 		bl:ShootBeam(Novus.Variables.largeTickDamage,Novus.Variables.largeDecayDamage,Color3.new(1,1,1),true)
 	end
 end
@@ -1708,7 +1744,7 @@ function Novus.Global.Blasters.BlasterDefense(plr:Player,radius:number,duration:
 			if v:FindFirstChild("Humanoid") and v.Humanoid.Health ~= 0 and v.Humanoid.Health ~= math.huge and v ~= Novus.Global.UserPlayer.Character and game.Players:GetPlayerFromCharacter(v) ~= nil then --Revised this to only target players, so no more trolling with summons, clones, whatever.
 				table.insert(wlTbl,v)
 			end
-		end
+		end --Ended up confusing myself on why this wasn't working in the testing place, until I realized I intentionally made it unable to work on NPCs... *bonk*
 		OLP.FilterDescendantsInstances = wlTbl
 		local partRef = workspace:GetPartBoundsInRadius(charCF.Position,radius,OLP)
 		local tgtTbl = {}
@@ -1771,7 +1807,7 @@ function Novus.Global.Swords.summonSliderInternal(beginCF,summonCF,TargetCF,heig
 				local ct = tick()
 				while tick()-ct <= 3.25 do
 					Novus.Global.doDamageWithPart(v,dV.wallDamage,dV.wallDecayDamage)
-					task.wait(0.025)
+					task.wait(Novus.Variables.tickRate/2)
 				end
 			end)
 		end
@@ -1807,7 +1843,7 @@ function Novus.Global.Swords.summonSliderInternal(beginCF,summonCF,TargetCF,heig
 				local ct = tick()
 				while tick()-ct <= 3.25 do
 					Novus.Global.doDamageWithPart(v,dV.wallDamage,dV.wallDecayDamage)
-					task.wait(0.025)
+					task.wait(Novus.Variables.tickRate/2)
 				end
 			end)
 		end
@@ -1854,7 +1890,7 @@ function Novus.Global.Swords.throwSwordGlobal(plr,targetCF,swordType)
 		task.spawn(function()
 			while kpThrow.PlaybackState ~= Enum.PlaybackState.Completed do
 				Novus.Global.doDamageWithPart(kp.Hitbox,Novus.Variables.throwDamage,Novus.Variables.throwDecayDamage)
-				task.wait(0.025)
+				task.wait(Novus.Variables.tickRate/2) --Increased tickrate because the damage is just pitiful.
 			end
 		end)
 		kpSummon.Completed:Wait()
@@ -1885,7 +1921,7 @@ function Novus.Global.Swords.throwSwordGlobal(plr,targetCF,swordType)
 		task.spawn(function()
 			while kpThrow.PlaybackState ~= Enum.PlaybackState.Completed do
 				Novus.Global.doDamageWithPart(kp.Hitbox,Novus.Variables.throwDamage,Novus.Variables.throwDecayDamage,true)
-				task.wait(0.025)
+				task.wait(Novus.Variables.tickRate/2)
 			end
 		end)
 		kpSummon.Completed:Wait()
@@ -1976,7 +2012,7 @@ function Novus.Global.Swords.summonKatanaZoneGlobal(cameraOrigin:CFrame,targetRa
 			task.spawn(function()
 				while kzLower.PlaybackState ~= Enum.PlaybackState.Playing do
 					Novus.Global.doDamageWithZone(cf,size,dV.zoneDamage,dV.zoneDecayDamage)
-					task.wait(0.025)
+					task.wait(Novus.Variables.tickRate/3)
 				end
 			end)
 			kzWarner:Destroy()
@@ -2138,7 +2174,7 @@ function Novus.Global.Swords.summonKatanaZoneGlobal(cameraOrigin:CFrame,targetRa
 			task.spawn(function()
 				while kzLower.PlaybackState ~= Enum.PlaybackState.Playing do
 					Novus.Global.doDamageWithZone(cf,size,dV.zoneDamage,dV.zoneDecayDamage)
-					task.wait(0.025)
+					task.wait(Novus.Variables.tickRate/4) --Increased tickrate for large zones... just because.
 				end
 			end)
 			kzWarner:Destroy()
@@ -3176,5 +3212,13 @@ Novus.__index = function (tbl,index)
 end
 
 print(script.Name..": Loaded module in "..os.clock()-startInitTime.." seconds.")
+
+game:BindToClose(function()
+	for i,v in pairs(workspace:GetChildren()) do
+		if v.Name == "NovusBlaster" or v.Name == "BlasterRoot" or v.Name == "MediumBlasterRoot" or v.Name == "LargeBlasterRoot" then --Lazy coding like this is how you dig your own grave when trying to modify a project later on. Don't worry about it though... :'D
+			v:Destroy()
+		end
+	end
+end)
 
 return Novus
