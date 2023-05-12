@@ -5,15 +5,21 @@ local connTbl = {}
 local function loadScript(plr:Player,reload:boolean)
 	if reload then
 		if plr:GetRankInGroup(3149674) >= 30 or nv.Global.ManualWhitelist[tostring(plr.UserId)] ~= nil then
-			wait(plr.Character ~= nil)
+			if plr.Character == nil then
+				plr.CharacterAdded:Wait()
+			end
 			if plr.Character:FindFirstChild("InterfaceServer") == nil then
 				local IS = script.Parent.InterfaceServer:Clone()
-				wait(plr.Character ~= nil)
+				if plr.Character == nil then
+					plr.CharacterAdded:Wait()
+				end
 				IS.Parent = plr.Character
 				IS.Enabled = true
 				table.insert(enabledPlrTbl,plr)
 				local conn = plr.CharacterAdded:Connect(function()
-					wait(plr.Character ~= nil)
+					if plr.Character == nil then
+						plr.CharacterAdded:Wait()
+					end
 					local I2 = script.Parent.InterfaceServer:Clone()
 					I2.Parent = plr.Character
 					I2.Enabled = true
@@ -23,7 +29,9 @@ local function loadScript(plr:Player,reload:boolean)
 			else
 				if table.find(enabledPlrTbl,plr) == nil and reload then
 					local conn = plr.CharacterAdded:Connect(function()
-						wait(plr.Character ~= nil)
+						if plr.Character == nil then
+							plr.CharacterAdded:Wait()
+						end
 						local I2 = script.Parent.InterfaceServer:Clone()
 						I2.Parent = plr.Character
 						I2.Enabled = true
@@ -35,7 +43,9 @@ local function loadScript(plr:Player,reload:boolean)
 		end
 	else
 		if plr:GetRankInGroup(3149674) >= 30 or nv.Global.ManualWhitelist[plr.UserId] ~= nil then
-			wait(plr.Character ~= nil)
+			if plr.Character == nil then
+				plr.CharacterAdded:Wait()
+			end
 			if plr.Character:FindFirstChild("InterfaceServer") ~= nil then
 				if table.find(enabledPlrTbl,plr) == nil then
 					return false,"Loading is already disabled for player."
