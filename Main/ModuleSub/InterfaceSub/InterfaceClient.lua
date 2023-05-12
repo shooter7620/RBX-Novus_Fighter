@@ -53,7 +53,7 @@ local function createAnimCDUI(Frm:Frame,cdTime:number)
 	frmCl.Parent = Frm
 	frmCl.TextButton:Destroy()
 	local frmText:TextButton = Frm.TextButton
-	local ot = frmText.Text
+	local ot = Frm:GetAttribute("Default")
 	local currCD = cdTime
 	frmCl.BorderSizePixel = 0
 	frmCl.Position = UDim2.fromScale(0,0)
@@ -96,6 +96,7 @@ local function changeMode(modeName:string,atkFrm:Frame)
 end
 
 local modeSwitchDB = false
+
 loadButton.MouseButton1Click:Once(function()
 	local s,v,i = script.Parent.EnableChar:InvokeServer()
 	if s then
@@ -103,7 +104,7 @@ loadButton.MouseButton1Click:Once(function()
 		CHInfoUI = UIMain.CharInfoUI
 		usgHelpButton = atkUI.UsgHelp
 		charInfoButton = atkUI.MoveInfo
-		UIMain.MenuUI:Destroy() --Why is this nil?
+		UIMain:FindFirstChild("MenuUI"):Destroy() --Why is this nil sometimes? Edit: Noticed it only happens in Studio. Might be an issue with that, then.
 		atkUI.Visible = true
 		modeIndex = {
 			["Sword"] = atkUI.SwordFrm,
@@ -208,7 +209,7 @@ loadButton.MouseButton1Click:Once(function()
 			end
 		end)
 		local conn = UIS.InputBegan:Connect(function (input,isProcessed)
-			if not isProcessed then
+			if not isProcessed and not modeSwitchDB then --Added a reference to the debounce for switching modes so you don't accidentally use moves from a different mode while switching... if you have lag. -shooter7620
 				if input.KeyCode == Enum.KeyCode.Q then
 					if not modeSwitchDB then
 						modeSwitchDB = true
@@ -219,7 +220,7 @@ loadButton.MouseButton1Click:Once(function()
 						elseif currentMode == "Telekinesis" then
 							changeMode("Sword",atkUI.SwordFrm)
 						end
-						task.wait(0.75)
+						task.wait(0.25)
 						modeSwitchDB = false
 					end
 				end
