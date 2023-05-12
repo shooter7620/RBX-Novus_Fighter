@@ -55,7 +55,7 @@ local function timeRecorder():(number,number)
 end
 local function reduceCDWithDelta(deltaTime:number)
 	for i,v in pairs(moveCDTbl) do
-		if v[1] == false then
+		if v[1] == false and v[4] ~= Novus.Moves[i][7] then
 			--decided to make this ignore after further consideration
 			v[4] = Novus.Moves[i][7]
 		elseif v[2] <= 0 then
@@ -109,7 +109,7 @@ local function initMove(plr:Player,moveName:string,...)
 				end
 			end
 			if moveExists then
-				if moveCDTbl[moveName] and moveCDTbl[moveName][1] == true then
+				if not moveCDTbl[moveName] or moveCDTbl[moveName][1] == true then
 					rmDB = false
 					return false
 				else
@@ -125,8 +125,8 @@ local function initMove(plr:Player,moveName:string,...)
 								rmDB = false
 								return false
 							end
-							for i2,v2 in pairs(v[4]) do
-								if v2 == moveName and moveCDTbl[v2][5] == true then
+							for i3,v3 in pairs(v[4]) do
+								if v3 == moveName and moveCDTbl[v3][5] == true then
 									rmDB = false
 									return false
 								end
@@ -138,7 +138,7 @@ local function initMove(plr:Player,moveName:string,...)
 				local moveDictionary = Novus.Moves[moveName]
 				local fArgTbl = {
 					["Katana_Barrage"] = {"Player","RemoteEvent"},
-					["Katana_Zone"] = {"Player","CFrame","Target","Ray"},
+					["Katana_Zone"] = {"Player","CFrame","BasePart","Ray"},
 					["Blue_Katana_Zone"] = {"Player","CFrame","Ray"},
 					["Katana_Sliders"] = {"Player","RemoteEvent"},
 					["Blue_Katana_Sliders"] = {"Player","RemoteEvent"},
