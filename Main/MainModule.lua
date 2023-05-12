@@ -144,7 +144,7 @@ Novus.Global.Blasters.TweeningInfo = {
 		0
 	),
 	BlasterFireDecay = TweenInfo.new(
-		1,
+		0.75,
 		Enum.EasingStyle.Linear,
 		Enum.EasingDirection.In,
 		0,
@@ -375,7 +375,7 @@ Novus.Moves = {
 		local charCF = plr.Character.HumanoidRootPart.CFrame
 		--Do whatever here, I guess.
 	end,false,{"ExampleGCDMoveReference1","ExampleGCDMoveReference2"}},{dmg = 0,decayDmg = 0,desc = "A template move for example purposes."}]] --Each move has seven available parameters (at the moment), move name (string), cooldown (in seconds), mode selector (which mode the move is attached to; if the moveset has a single mode it should be set to "Default", and "Universal" if it can be used across all modes), slot ID (the corresponding slot the move is assigned to for the mode), function (for carrying out the move), GCD (global cooldown), meaning that other moves will not be able to be used if they also have global cooldown; and finally, GCD move references, i.e. The moves which cannot be used while this move is on cooldown (leaving this nil won't throw an error).
-	Blink = {"Blink",7,"Universal",1,function (plr:Player,targetCF:CFrame,plrMouseTarget:BasePart)
+	Blink = {"Blink",2,"Universal",1,function (plr:Player,targetCF:CFrame,plrMouseTarget:BasePart)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
@@ -525,7 +525,7 @@ Novus.Moves = {
 		Novus.Global.Swords.summonKatanaZoneGlobal(plrCameraOrigin,plrMouseRay,selection)
 		Novus.Global.moveCDTbl["Large_Katana_Zones"][5] = false
 	end,true,{"Telekinetic_Suspension","Katana_Zone","Blue_Katana_Zone"},{dmg = Novus.Variables.zoneDamage.."/tick",decayDmg = Novus.Variables.zoneDecayDamage.."/tick",desc = "Summons a large variant of the Normal or Blue Katana Zone. Triggers global cooldown with any other moves which have that parameter enabled."}},
-	Rail_Blaster = {"Rail Blaster",5,"Blaster",1,function (plr:Player,targetCF:CFrame)
+	Rail_Blaster = {"Rail Blaster",3,"Blaster",1,function (plr:Player,targetCF:CFrame)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
@@ -544,7 +544,7 @@ Novus.Moves = {
 		Novus.Global.Blasters.SummonBlasterExp(beginCF,vectorToCF,targetCF,"Medium",false)
 		Novus.Global.moveCDTbl["Rail_Blaster"][5] = false
 	end,false,{"Large_Rail_Blaster","Revolving_Rail_Blasters","Homing_Blasters","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Summons a Rail Blaster on either side of you aimed in the direction of the cursor, which fires after a short delay."}},
-	Large_Rail_Blaster = {"Large Rail Blaster",10,"Blaster",2,function (plr:Player,targetCF:CFrame)
+	Large_Rail_Blaster = {"Large Rail Blaster",7,"Blaster",2,function (plr:Player,targetCF:CFrame)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
@@ -563,7 +563,7 @@ Novus.Moves = {
 		Novus.Global.Blasters.SummonBlasterExp(beginCF,vectorToCF,targetCF,"Large")
 		Novus.Global.moveCDTbl["Large_Rail_Blaster"][5] = false
 	end,false,{"Rail_Blaster","Revolving_Blasters","Homing_Blasters","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.largeTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.largeDecayDamage.."/tick (per blaster)",desc = "Summons a large Rail Blaster on either side of you aimed in the direction of the cursor, which fires after a slightly longer delay; but does significantly more damage and has a much larger beam."}},
-	Revolving_Rail_Blasters = {"Revolving Rail Blasters",12,"Blaster",3,function (plr:Player,CFRemote:RemoteEvent)
+	Revolving_Rail_Blasters = {"Revolving Rail Blasters",10,"Blaster",3,function (plr:Player,CFRemote:RemoteEvent)
 		local ft = 0
 		local conn = CFRemote.OnServerEvent:Connect(function(plr:CFrame,targetCF:CFrame)
 			if plr ~= Novus.Global.UserPlayer then
@@ -655,7 +655,7 @@ Novus.Moves = {
 		task.wait(2.25)
 		Novus.Global.moveCDTbl["Quad_Rail_Blasters"][5] = false
 	end,false,{},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Summons a cross formation of Rail Blasters above the point of surface contact at the cursor."}},
-	Homing_Blasters = {"Homing Blasters",15,"Blaster",5,function (plr:Player)
+	Homing_Blasters = {"Homing Blasters",12,"Blaster",5,function (plr:Player)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
@@ -695,7 +695,7 @@ Novus.Moves = {
 		task.wait(1.6)
 		Novus.Global.moveCDTbl["Homing_Blasters"][5] = false
 	end,false,{"Rail_Blaster","Revolving_Rail_Blasters","Large_Rail_Blaster","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.tickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.decayDamage.."/tick (per blaster)",desc = "A bit of a misnomer. Actually just summons three small Rail Blasters in quick succession on all targets within a 500 stud radius of you."}},
-	Blaster_Barrage = {"Blaster Barrage",25,"Blaster",6,function (plr:Player)
+	Blaster_Barrage = {"Blaster Barrage",20,"Blaster",6,function (plr:Player)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
@@ -732,13 +732,13 @@ Novus.Moves = {
 		end
 		task.wait(9)
 		Novus.Global.moveCDTbl["Blaster_Barrage"][5] = false
-	end,true,{"Rail_Blaster","Revolving_Rail_Blasters","Large_Rail_Blaster","Quad_Rail_Blasters","Homing_Blasters","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "[Prone to lag issues] Summons a barrage of Rail Blasters on all targets within a 500 stud radius of you. If you're fighting a crowd and this doesn't destroy them, then you may have a problem on your hands."}},
+	end,true,{"Rail_Blaster","Revolving_Rail_Blasters","Large_Rail_Blaster","Quad_Rail_Blasters","Homing_Blasters","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Summons a barrage of Rail Blasters on all targets within a 500 stud radius of you. If you're fighting a crowd and this doesn't destroy them, then you may have a problem on your hands."}},
 	Blaster_Circle = {"Blaster Circle",50,"Blaster",7,function (plr:Player,plrCameraOrigin:CFrame,plrMouseTarget:BasePart,plrMouseRay:Ray) --This is unfortunately... also quite cumbersome on the server and clients. Perhaps try preserving the blasters once they are spawned?
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
 		end
-		task.spawn(Novus.Global.Force.BlueHold,Novus.Global.UserPlayer,2.7)
+		task.spawn(Novus.Global.Force.BlueHold,Novus.Global.UserPlayer,27)
 		Novus.Global.Blasters.UseBlasterCircle(Novus.Global.UserPlayer,6,plrCameraOrigin,plrMouseTarget,plrMouseRay)
 		Novus.Global.moveCDTbl["Blaster_Circle"][5] = false
 	end,true,{"Rail_Blaster","Large_Rail_Blaster","Homing_Blasters","Quad_Rail_Blasters","Blaster_Barrage"},{dmg = Novus.Variables.tickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.decayDamage.."/tick (per blaster)",desc = "You hold down all targets in a 500 stud radius with telekinetic force, preventing them from jumping; then you summon a rotating sequential circle of small Rail Blasters for a little while, before releasing your telekinetic force on all targets affected."}},
@@ -823,11 +823,11 @@ Novus.Moves = {
 	end,true,{"Large_Rail_Blaster","Homing_Blasters","Blaster_Circle","Rail_Blaster_Defense","Blue_Katana_Zone"},{dmg = "N/A",decayDmg = "N/A",desc = "Does no damage, but instead pushes all targets within a large radius directly away from you."}}
 }
 
-Novus.Variables.hitsTracked = 0::number
+--[[Novus.Variables.hitsTracked = 0::number
 Novus.Variables.hitDamageTracked = 0::number
 Novus.Variables.baseTrackExpireDelta = 2::number
 Novus.Variables.currentTrackExpireDelta = 2::number
-Novus.Variables.lastHitTime = 0::number
+Novus.Variables.lastHitTime = 0::number]]
 
 function Novus.new()
 	return setmetatable({},Novus)
@@ -1009,26 +1009,28 @@ function Novus.Passives.EnableReflexes(plr:Player)
 	end)
 end
 
-function Novus.Global.HitComboDisplay(dmg:number):(number,number)
+--[[function Novus.Global.HitComboDisplay(dmg:number):(number,number)
+	if dmg < 0 then
+		return false,warn("Damage value cannot be less than 0.")
+	end
 	if Novus.Variables.currentTrackExpireDelta == 0 then
 		Novus.Variables.currentTrackExpireDelta = Novus.Variables.baseTrackExpireDelta
 	end
 	if Novus.Variables.lastHitTime == 0 then
 		Novus.Variables.lastHitTime = tick()
 	end
-	if tick()-Novus.Variables.lastHitTime < 0.25 and tick()-Novus.Variables.lastHitTime <= Novus.Variables.currentTrackDelta then
+	if tick()-Novus.Variables.lastHitTime <= Novus.Variables.currentTrackExpireDelta then
 		Novus.Variables.hitsTracked += 1
 		Novus.Variables.hitDamageTracked += dmg
-		Novus.Variables.currentTrackExpireDelta -= Novus.Variables.currentTrackExpireDelta * 0.1 --Expiration time will decrease by 10% each time there is a hit, so as to encourage accurate, quick attacking (if the user cares about the useless display, that is). -shooter7620
+		Novus.Variables.currentTrackExpireDelta -= Novus.Variables.currentTrackExpireDelta * 0.00001 --Expiration time will decrease by 0.001% each time there is a hit, so as to encourage accurate, quick attacking (if the user cares about the useless display, that is). -shooter7620
 		Novus.Variables.lastHitTime = tick()
-	elseif tick()-Novus.Variables.lastHitTime > Novus.Variables.currentTrackDelta then
+	elseif tick()-Novus.Variables.lastHitTime > Novus.Variables.currentTrackExpireDelta then
 		Novus.Variables.hitsTracked = 0
 		Novus.Variables.hitDamageTracked = 0
 		Novus.Variables.currentTrackExpireDelta = Novus.Variables.baseTrackExpireDelta
 		Novus.Variables.lastHitTime = 0
 	end
-	return Novus.Variables.hitsTracked,Novus.Variables.hitDamageTracked
-end
+end]] --Deprecated, as it is no longer planned to be used in any way. Turns out that getting the client-side part of this to work as intended was a bit too much, unfortunately.
 function Novus.Global.doDamageToHumanoid(humanoid:Humanoid,dmg:number,bypass:boolean,decayDmg:number)
 	if bypass == nil then
 		bypass = false
@@ -1410,7 +1412,7 @@ end
 		rBLDTween.Completed:Wait()
 		rBR:Destroy()
 	end
-end]]
+end]] --No longer used for the sake of optimization. Has created an issue when "Blaster Circle" is used, but I'll probably replace that move anyways at this rate; given that itself causes performance issues as well.
 function Novus.Global.Blasters.UseHomingBlasters(target:Model,blasterCount:number,BlasterSize:string,blasterDelay:number,fireRepeats:number) --...Desperately needs a rework, or an alternate function. Too prone to performance issues when used in remotely large numbers or the delay is set too low.
 	assert(target:FindFirstChild("Humanoid") ~= nil,"Target must be a character model.")
 	if blasterCount <= 4 then
@@ -1641,8 +1643,8 @@ function Novus.Blaster.BlasterClass:ShootBeam(damage:number,decaydamage:number,c
 	local blRecoil = TweenService:Create(beamBase.Parent,TAssetTbl[6],{CFrame = beamBase.Parent.CFrame + beamBase.Parent.CFrame.LookVector * (-100 * math.clamp(beamBase.Parent:GetAttribute("Scale")/2,1,3))})
 	local baseDecay = TweenService:Create(beamBase,TAssetTbl[7],TAssetTbl[13])
 	local beamDecay = TweenService:Create(beamRay,TAssetTbl[7],TAssetTbl[14])
-	local baseInvis = TweenService:Create(beamBase,TAssetTbl[4],TAssetTbl[12])
-	local beamInvis = TweenService:Create(beamRay,TAssetTbl[4],TAssetTbl[12])
+	local baseInvis = TweenService:Create(beamBase,TAssetTbl[3],TAssetTbl[12])
+	local beamInvis = TweenService:Create(beamRay,TAssetTbl[3],TAssetTbl[12])
 	local blDecay = TweenService:Create(BL,TAssetTbl[2],TAssetTbl[12])
 	local blFSound:Sound = beamBase.Parent:FindFirstChild("placeholderFire2")
 	blFSound:Play()
@@ -1674,7 +1676,7 @@ function Novus.Blaster.BlasterClass:ShootBeam(damage:number,decaydamage:number,c
 		blRecoil.Completed:Wait()
 		baseDecay:Play()
 		beamDecay:Play()
-		task.wait(TAssetTbl[7].Time*0.8)
+		task.wait(TAssetTbl[7].Time*0.4)
 		baseInvis:Play()
 		beamInvis:Play()
 		beamInvis.Completed:Wait()
@@ -1691,7 +1693,7 @@ function Novus.Blaster.BlasterClass:ShootBeam(damage:number,decaydamage:number,c
 		beamOsc.Completed:Wait()
 		baseDecay:Play()
 		beamDecay:Play()
-		task.wait(TAssetTbl[7].Time*0.8)
+		task.wait(TAssetTbl[7].Time*0.45)
 		baseInvis:Play()
 		beamInvis:Play()
 		beamInvis.Completed:Wait()
