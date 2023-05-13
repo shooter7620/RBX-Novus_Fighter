@@ -270,6 +270,9 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move1,v)
 								end
 							elseif currentMode == "Telekinesis" then
+								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 100 then
+									return false
+								end
 								local b,rm:RemoteEvent = script.Parent.RequestRemote:InvokeServer("TKSusp")
 								if not b then
 									return false
@@ -301,11 +304,17 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move2,v)
 								end
 							elseif currentMode == "Sword" then
-								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.Target,mouse.UnitRay)
+								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 500 then
+									return false
+								end
+								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.UnitRay)
 								if s then
 									createAnimCDUI(slots.Move2,v)
 								end
 							elseif currentMode == "Telekinesis" then
+								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 100 then
+									return false
+								end
 								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Target)
 								if s then
 									createAnimCDUI(slots.Move2,v)
@@ -334,7 +343,10 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move3,v)
 								end
 							elseif currentMode == "Sword" then
-								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.Target,mouse.UnitRay)
+								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 500 then
+									return false
+								end
+								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.UnitRay)
 								if s then
 									createAnimCDUI(slots.Move3,v)
 								end
@@ -411,6 +423,9 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move6,v)
 								end
 							elseif currentMode == "Sword" then
+								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 500 then
+									return false
+								end
 								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.Target,mouse.UnitRay)
 								if s then
 									createAnimCDUI(slots.Move6,v)
