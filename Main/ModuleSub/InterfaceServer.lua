@@ -138,7 +138,7 @@ local function initMove(plr:Player,moveName:string,...)
 				local moveDictionary = Novus.Moves[moveName]
 				local fArgTbl = {
 					["Katana_Barrage"] = {"Player","RemoteEvent"},
-					["Katana_Zone"] = {"Player","CFrame","BasePart","Ray"},
+					["Katana_Zone"] = {"Player","CFrame","Ray"},
 					["Blue_Katana_Zone"] = {"Player","CFrame","Ray"},
 					["Katana_Sliders"] = {"Player","RemoteEvent"},
 					["Blue_Katana_Sliders"] = {"Player","RemoteEvent"},
