@@ -153,8 +153,8 @@ local function initMove(plr:Player,moveName:string,...)
 					["Rail_Blaster_Defense"] = {"Player"},
 					--["Super_Blaster_Circle"] = {"Player","CFrame","BasePart","Ray"},
 					--Once again, the move above was disabled because it was impractical to fix the performance issues with it, so it was replaced... still need a better replacement. -shooter7620
-					["Telekinetic_Suspension"] = {"Player","BasePart","RemoteEvent"},
-					["Telekinetic_Slam"] = {"Player","BasePart"},
+					["Telekinetic_Suspension"] = {"Player","BasePart","RemoteEvent","CFrame","CFrame"},
+					["Telekinetic_Slam"] = {"Player","BasePart","CFrame","CFrame"},
 					["Telekinetic_Repulse"] = {"Player"},
 					["Blink"] = {"Player","CFrame"},
 					["Booster_Kit"] = {"Player"}
@@ -162,27 +162,18 @@ local function initMove(plr:Player,moveName:string,...)
 				local argsTuple = {}
 				for i,v in pairs(fArgTbl) do
 					if moveName == i then
-						for i2,v2 in pairs(argTbl) do
-							if typeof(v2) == v[1] then
+						for i2,v2 in ipairs(argTbl) do
+							if i2 <= #v and typeof(v2) == v[i2] or typeof(v2) == "Instance" and v2:IsA(v[i2]) then
 								table.insert(argsTuple,v2)
-							elseif typeof(v2) == "Instance" and v2:IsA(v[1]) then
-								table.insert(argsTuple,v2)
-							end
-							if typeof(v2) == v[2] then
-								table.insert(argsTuple,v2)
-							elseif typeof(v2) == "Instance" and v2:IsA(v[2] or "DataModel") then
-								table.insert(argsTuple,v2)
-							end
-							if typeof(v2) == v[3] then
-								table.insert(argsTuple,v2)
-							elseif typeof(v2) == "Instance" and v2:IsA(v[3] or "DataModel") then
-								table.insert(argsTuple,v2)
-							end
-							if typeof(v2) == v[4] then
-								table.insert(argsTuple,v2)
-							elseif typeof(v2) == "Instance" and v2:IsA(v[4] or "DataModel") then
-								table.insert(argsTuple,v2)
-							end
+							else
+								if typeof(v2) == "Instance" then
+									warn("Improper parameter type for argument #"..i2..", type was "..v2.ClassName.."; requested type is "..v[i2]..".")
+								else
+									warn("Improper parameter type for argument #"..i2..", type was "..typeof(v2).."; requested type is "..v[i2]..".")
+								end
+								rmDB = false
+								return false
+							end --Hopefully a much more elegant solution that doesn't look so ugly.
 						end
 					end
 				end
