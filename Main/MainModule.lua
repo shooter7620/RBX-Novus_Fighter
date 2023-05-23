@@ -797,20 +797,20 @@ Novus.Moves = {
 		Novus.Global.Blasters.BlasterDefense(plr,150,30,2)
 		Novus.Global.moveCDTbl["Rail_Blaster_Defense"][5] = false
 	end,false,{"Blaster_Circle","Blaster_Barrage","Homing_Blasters"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Summons a pair of Rail Blasters every 2 seconds on every target within 150 studs of you, for a duration of 30 seconds."}},
-	Telekinetic_Suspension = {"Telekinetic Suspension",6,"Telekinesis",1,function (plr:Player,plrMouseTarget:BasePart,CFRemote:RemoteEvent)
+	Telekinetic_Suspension = {"Telekinetic Suspension",6,"Telekinesis",1,function (plr:Player,plrMouseTarget:BasePart,CFRemote:RemoteEvent,plrMouseHit:CFrame,plrMouseOrigin:CFrame)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
 		end
-		Novus.Global.Force.forceHold(Novus.Global.UserPlayer,plrMouseTarget,CFRemote)
+		Novus.Global.Force.forceHold(Novus.Global.UserPlayer,plrMouseTarget,CFRemote,plrMouseHit,plrMouseOrigin)
 		Novus.Global.moveCDTbl["Telekinetic_Suspension"][5] = false
 	end,true,{"Rail_Blaster","Large_Rail_Blaster","Homing_Blasters","Quad_Rail_Blasters","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense","Blue_Katana_Zone"},{dmg = Novus.Variables.forceSlamDamage.." (if target is pushed away into a surface)",decayDmg = Novus.Variables.forceSlamDecayDamage.." (if target is pushed away into a surface)",desc = "Suspends a humanoid target selected with the mouse cursor, and pushes them away in the direction of the cursor if the key used to initiate this move is released (i.e. You have to hold, not press the initiator key when using this in order to be able to push away your target. Although, just quickly pressing the key again can also work). If the target is pushed into a surface, they suffer damage."}},
-	Telekinetic_Slam = {"Telekinetic Slam",12,"Telekinesis",2,function (plr:Player,plrMouseTarget:BasePart)
+	Telekinetic_Slam = {"Telekinetic Slam",12,"Telekinesis",2,function (plr:Player,plrMouseTarget:BasePart,plrMouseHit:CFrame,plrMouseOrigin:CFrame)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
 		end
-		Novus.Global.Force.ForceSlam(Novus.Global.UserPlayer,plrMouseTarget)
+		Novus.Global.Force.ForceSlam(Novus.Global.UserPlayer,plrMouseTarget,plrMouseHit,plrMouseOrigin)
 		Novus.Global.moveCDTbl["Telekinetic_Slam"][5] = false
 	end,true,{"Large_Rail_Blaster","Homing_Blasters","Blaster_Circle","Rail_Blaster_Defense","Blue_Katana_Zone"},{dmg = Novus.Variables.forceHeavySlamDamage.."",decayDmg = Novus.Variables.forceHeavySlamDecayDamage.."",desc = "Grabs a target selected by the mouse cursor with telekinetic force, lifts them into the air; and slams them down to the ground. Does significantly more damage than \"Telekinetic Suspension\"."}},
 	Telekinetic_Repulse = {"Telekinetic Repulse",20,"Telekinesis",3,function (plr:Player)
@@ -2540,21 +2540,125 @@ function Novus.Global.Force.forcePushDirectional(plr:Player,hm:Humanoid,mousePos
 		aniTrack:Destroy()
 	end
 end
-function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:RemoteEvent)
+function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:RemoteEvent,Hit:CFrame,Origin:CFrame)
 	local TI = Novus.Global.Force.TweeningInfo
 	local dV = Novus.Variables
-	if Target ~= nil then
-		if Target.Parent:FindFirstChild("Humanoid") ~= nil then
-			if (plr.Character.HumanoidRootPart.Position-Target.Parent.HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
+	if Target ~= nil and Target.Parent:FindFirstChild("Humanoid") ~= nil then
+		if (plr.Character.HumanoidRootPart.Position-Target.Parent.HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
+			local isFired = false
+			local cs = Novus.Global.ModelFolderReference.CoilSoul:Clone()
+			cs.Parent = Target.Parent
+			cs.CFrame = Target.Parent.HumanoidRootPart.CFrame
+			cs.CFrame += (cs.CFrame.RightVector * -3) + (cs.CFrame.UpVector * 1.75)
+			local csw = Instance.new("WeldConstraint")
+			csw.Parent = Target.Parent.HumanoidRootPart
+			csw.Name = "CSWeld"
+			csw.Part0 = Target.Parent.HumanoidRootPart
+			csw.Part1 = cs
+			cs.Anchored = false
+			local scSound = Novus.Global.AudioFolderReference.ForceSound:Clone()
+			scSound.Parent = plr.Character.Head
+			local sconn = scSound.Played:Connect(function()
+				Novus.Global.Force.flashForceEye(plr,scSound.TimeLength*2)
+			end)
+			local animator = Instance.new("Animator")
+			animator.Parent = plr.Character.Humanoid
+			local aniTrack:AnimationTrack = animator:LoadAnimation(dV.forceHoldAnim)
+			aniTrack.Priority = Enum.AnimationPriority.Action4
+			cs.Mesh.TextureId = cs.Grav.Value
+			local csIndicate = cs:Clone()
+			csIndicate.Parent = Target.Parent.HumanoidRootPart
+			csIndicate.Anchored = true
+			local HoldTween = TweenService:Create(Target.Parent.HumanoidRootPart,TI.SoulChangeIndicate,{CFrame = Target.Parent.HumanoidRootPart.CFrame + Target.Parent.HumanoidRootPart.CFrame.UpVector * 3})
+			local indicateCF = TweenService:Create(csIndicate.Mesh,TI.SoulChangeIndicate,{Scale = Vector3.new(csIndicate.Mesh.Scale.X*2,csIndicate.Mesh.Scale.Y*2,csIndicate.Mesh.Scale.Z*2)})
+			local fadeCF = TweenService:Create(csIndicate,TI.SoulChangeIndicate,{Transparency = 1})
+			Target.Parent.Humanoid:UnequipTools()
+			Target.Parent.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+			Target.Parent.HumanoidRootPart.Anchored = true
+			aniTrack:Play(0,1,0.5)
+			task.spawn(function()
+				aniTrack.Stopped:Wait()
+				aniTrack:AdjustSpeed(0)
+			end)
+			scSound:Play()
+			HoldTween:Play()
+			indicateCF:Play()
+			fadeCF:Play()
+			task.spawn(function()
+				indicateCF.Completed:Wait()
+				csIndicate:Destroy()
+			end)
+			HoldTween.Completed:Wait()
+			local OscTween = TweenService:Create(Target.Parent.HumanoidRootPart,TI.SoulOscillate,{CFrame = Target.Parent.HumanoidRootPart.CFrame + Target.Parent.HumanoidRootPart.CFrame.UpVector * -1})
+			OscTween:Play()
+			local conn = CFRemote.OnServerEvent:Once(function (plr,mousePos)
+				if OscTween.PlaybackState == Enum.PlaybackState.Completed then
+					return false
+				end
+				isFired = true
+				OscTween:Cancel()
+				aniTrack.Priority = Enum.AnimationPriority.Action3
+				aniTrack:Destroy()
+				Novus.Global.Force.forcePushDirectional(plr,Target.Parent.Humanoid,mousePos)
+				sconn:Disconnect()
+			end)
+			CFRemote:FireClient(plr,true)
+			OscTween:GetPropertyChangedSignal("PlaybackState"):Wait()
+			if OscTween.PlaybackState == Enum.PlaybackState.Completed then
+				if isFired == false then
+					conn:Disconnect()
+					cs.Mesh.TextureId = cs.Free.Value
+					local ind2 = cs:Clone()
+					ind2.Parent = Target.Parent.HumanoidRootPart
+					ind2.Anchored = true
+					local indCF2 = TweenService:Create(ind2.Mesh,TI.SoulChangeIndicate,{Scale = Vector3.new(ind2.Mesh.Scale.X*2,ind2.Mesh.Scale.Y*2,ind2.Mesh.Scale.Z*2)})
+					local indFade = TweenService:Create(ind2,TI.SoulChangeIndicate,{Transparency = 1})
+					local csFade = TweenService:Create(cs,TI.SoulChangeIndicate,{Transparency = 1})
+					Target.Parent.Humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+					Target.Parent.HumanoidRootPart.Anchored = false
+					aniTrack:AdjustSpeed(-0.5)
+					scSound:Play()
+					indCF2:Play()
+					indFade:Play()
+					task.spawn(function()
+						indCF2.Completed:Wait()
+						ind2:Destroy()
+						csFade:Play()
+					end)
+					csFade.Completed:Wait()
+					cs:Destroy()
+					sconn:Disconnect()
+					scSound:Destroy()
+					aniTrack.Ended:Wait()
+					aniTrack:Destroy()
+				end
+			end
+		end
+	elseif Hit ~= nil and Origin ~= nil then --This uses a shapecast so it doesn't fail if your cursor is just shy of a target... neat.
+		local rtParams = RaycastParams.new()
+		rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+		rtParams.RespectCanCollide = false
+		rtParams.IgnoreWater = true
+		local wlTbl = {}
+		for i,v:Instance in pairs(workspace:GetDescendants()) do
+			if v:IsA("BasePart") and v.Parent:IsA("Model") and v.Parent:FindFirstChild("Humanoid") and game.Players:GetPlayerFromCharacter(v.Parent) ~= Novus.Global.UserPlayer and v.Parent.Humanoid.Health > 0 then
+				table.insert(wlTbl,v)
+			end
+		end
+		rtParams.FilterDescendantsInstances = wlTbl
+		local rtresult = workspace:Blockcast(Origin,Vector3.new(20,20,1),(Hit.Position-Origin.Position).Unit*dV.forceEffectRange,rtParams)
+		if rtresult ~= nil and rtresult.Instance.Parent.Humanoid.Health > 0 then
+			local Target2 = rtresult.Instance
+			if (plr.Character.HumanoidRootPart.Position-Target2.Parent.HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
 				local isFired = false
 				local cs = Novus.Global.ModelFolderReference.CoilSoul:Clone()
-				cs.Parent = Target.Parent
-				cs.CFrame = Target.Parent.HumanoidRootPart.CFrame
+				cs.Parent = Target2.Parent
+				cs.CFrame = Target2.Parent.HumanoidRootPart.CFrame
 				cs.CFrame += (cs.CFrame.RightVector * -3) + (cs.CFrame.UpVector * 1.75)
 				local csw = Instance.new("WeldConstraint")
-				csw.Parent = Target.Parent.HumanoidRootPart
+				csw.Parent = Target2.Parent.HumanoidRootPart
 				csw.Name = "CSWeld"
-				csw.Part0 = Target.Parent.HumanoidRootPart
+				csw.Part0 = Target2.Parent.HumanoidRootPart
 				csw.Part1 = cs
 				cs.Anchored = false
 				local scSound = Novus.Global.AudioFolderReference.ForceSound:Clone()
@@ -2568,14 +2672,14 @@ function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:Remote
 				aniTrack.Priority = Enum.AnimationPriority.Action4
 				cs.Mesh.TextureId = cs.Grav.Value
 				local csIndicate = cs:Clone()
-				csIndicate.Parent = Target.Parent.HumanoidRootPart
+				csIndicate.Parent = Target2.Parent.HumanoidRootPart
 				csIndicate.Anchored = true
-				local HoldTween = TweenService:Create(Target.Parent.HumanoidRootPart,TI.SoulChangeIndicate,{CFrame = Target.Parent.HumanoidRootPart.CFrame + Target.Parent.HumanoidRootPart.CFrame.UpVector * 3})
+				local HoldTween = TweenService:Create(Target2.Parent.HumanoidRootPart,TI.SoulChangeIndicate,{CFrame = Target2.Parent.HumanoidRootPart.CFrame + Target2.Parent.HumanoidRootPart.CFrame.UpVector * 3})
 				local indicateCF = TweenService:Create(csIndicate.Mesh,TI.SoulChangeIndicate,{Scale = Vector3.new(csIndicate.Mesh.Scale.X*2,csIndicate.Mesh.Scale.Y*2,csIndicate.Mesh.Scale.Z*2)})
 				local fadeCF = TweenService:Create(csIndicate,TI.SoulChangeIndicate,{Transparency = 1})
-				Target.Parent.Humanoid:UnequipTools()
-				Target.Parent.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-				Target.Parent.HumanoidRootPart.Anchored = true
+				Target2.Parent.Humanoid:UnequipTools()
+				Target2.Parent.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+				Target2.Parent.HumanoidRootPart.Anchored = true
 				aniTrack:Play(0,1,0.5)
 				task.spawn(function()
 					aniTrack.Stopped:Wait()
@@ -2590,7 +2694,7 @@ function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:Remote
 					csIndicate:Destroy()
 				end)
 				HoldTween.Completed:Wait()
-				local OscTween = TweenService:Create(Target.Parent.HumanoidRootPart,TI.SoulOscillate,{CFrame = Target.Parent.HumanoidRootPart.CFrame + Target.Parent.HumanoidRootPart.CFrame.UpVector * -1})
+				local OscTween = TweenService:Create(Target2.Parent.HumanoidRootPart,TI.SoulOscillate,{CFrame = Target2.Parent.HumanoidRootPart.CFrame + Target2.Parent.HumanoidRootPart.CFrame.UpVector * -1})
 				OscTween:Play()
 				local conn = CFRemote.OnServerEvent:Once(function (plr,mousePos)
 					if OscTween.PlaybackState == Enum.PlaybackState.Completed then
@@ -2600,7 +2704,7 @@ function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:Remote
 					OscTween:Cancel()
 					aniTrack.Priority = Enum.AnimationPriority.Action3
 					aniTrack:Destroy()
-					Novus.Global.Force.forcePushDirectional(plr,Target.Parent.Humanoid,mousePos)
+					Novus.Global.Force.forcePushDirectional(plr,Target2.Parent.Humanoid,mousePos)
 					sconn:Disconnect()
 				end)
 				CFRemote:FireClient(plr,true)
@@ -2610,13 +2714,13 @@ function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:Remote
 						conn:Disconnect()
 						cs.Mesh.TextureId = cs.Free.Value
 						local ind2 = cs:Clone()
-						ind2.Parent = Target.Parent.HumanoidRootPart
+						ind2.Parent = Target2.Parent.HumanoidRootPart
 						ind2.Anchored = true
 						local indCF2 = TweenService:Create(ind2.Mesh,TI.SoulChangeIndicate,{Scale = Vector3.new(ind2.Mesh.Scale.X*2,ind2.Mesh.Scale.Y*2,ind2.Mesh.Scale.Z*2)})
 						local indFade = TweenService:Create(ind2,TI.SoulChangeIndicate,{Transparency = 1})
 						local csFade = TweenService:Create(cs,TI.SoulChangeIndicate,{Transparency = 1})
-						Target.Parent.Humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
-						Target.Parent.HumanoidRootPart.Anchored = false
+						Target2.Parent.Humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+						Target2.Parent.HumanoidRootPart.Anchored = false
 						aniTrack:AdjustSpeed(-0.5)
 						scSound:Play()
 						indCF2:Play()
@@ -2633,25 +2737,149 @@ function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:Remote
 						aniTrack.Ended:Wait()
 						aniTrack:Destroy()
 					end
-				else
-					return false,"Target out of range"
 				end
 			end
 		end
+	else
+		return false,"Target out of range"
 	end
 end
-function Novus.Global.Force.ForceSlam(plr,Target:BasePart)
+function Novus.Global.Force.ForceSlam(plr,Target:BasePart,Hit:CFrame,Origin:CFrame)
 	local TI = Novus.Global.Force.TweeningInfo
 	local dV = Novus.Variables
-	if Target ~= nil then
-		if Target:FindFirstAncestorWhichIsA("Model"):FindFirstChild("Humanoid") ~= nil then
-			if (plr.Character.HumanoidRootPart.Position-Target:FindFirstAncestorWhichIsA("Model").HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
+	if Target ~= nil and Target:FindFirstAncestorWhichIsA("Model"):FindFirstChild("Humanoid") ~= nil then
+		if (plr.Character.HumanoidRootPart.Position-Target:FindFirstAncestorWhichIsA("Model").HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
+			local animator = Instance.new("Animator")
+			animator.Parent = plr.Character.Humanoid
+			local aniTrack:AnimationTrack = animator:LoadAnimation(dV.forceSlamAnim)
+			local isFired = false
+			local cs = Novus.Global.ModelFolderReference.CoilSoul:Clone()
+			local charModel = Target:FindFirstAncestorWhichIsA("Model")
+			cs.Parent = charModel
+			cs.CFrame = charModel.HumanoidRootPart.CFrame
+			cs.CFrame += (cs.CFrame.RightVector * -3) + (cs.CFrame.UpVector * 1.75)
+			local csw = Instance.new("WeldConstraint")
+			csw.Parent = charModel.HumanoidRootPart
+			csw.Name = "CSWeld"
+			csw.Part0 = charModel.HumanoidRootPart
+			csw.Part1 = cs
+			cs.Anchored = false
+			local scSound = Novus.Global.AudioFolderReference.ForceSound:Clone()
+			scSound.Parent = plr.Character.Head
+			local sconn = scSound.Played:Connect(function()
+				Novus.Global.Force.flashForceEye(plr,scSound.TimeLength*2)
+			end)
+			cs.Mesh.TextureId = cs.Grav.Value
+			local csIndicate = cs:Clone()
+			csIndicate.Parent = charModel.HumanoidRootPart
+			csIndicate.Anchored = true
+			local ForcePushOrPullExp = TweenInfo.new(
+				1,
+				Enum.EasingStyle.Sine,
+				Enum.EasingDirection.Out,
+				0,
+				false,
+				0
+			)
+			local HoldTween = TweenService:Create(charModel.HumanoidRootPart,ForcePushOrPullExp,{CFrame = charModel.HumanoidRootPart.CFrame + charModel.HumanoidRootPart.CFrame.UpVector * 20})
+			local indicateCF = TweenService:Create(csIndicate.Mesh,TI.SoulChangeIndicate,{Scale = Vector3.new(csIndicate.Mesh.Scale.X*2,csIndicate.Mesh.Scale.Y*2,csIndicate.Mesh.Scale.Z*2)})
+			local fadeCF = TweenService:Create(csIndicate,TI.SoulChangeIndicate,{Transparency = 1})
+			charModel.Humanoid:UnequipTools()
+			charModel.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+			charModel.HumanoidRootPart.Anchored = true
+			scSound:Play()
+			aniTrack:Play(0,1,1)
+			HoldTween:Play()
+			indicateCF:Play()
+			fadeCF:Play()
+			task.spawn(function()
+				indicateCF.Completed:Wait()
+				csIndicate:Destroy()
+			end)
+			HoldTween.Completed:Wait()
+			local rtParams = RaycastParams.new()
+			local blTable = {}
+			for k,v in pairs(workspace:GetDescendants()) do
+				if v:IsA("BasePart") then
+					if v.Transparency == 1 then
+						table.insert(blTable,v)
+					elseif v.Parent:FindFirstChild("Humanoid") then
+						table.insert(blTable,v)
+					end
+				end
+			end
+			rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+			rtParams.IgnoreWater = true
+			rtParams.RespectCanCollide = true
+			rtParams.FilterDescendantsInstances = blTable
+			local rt = workspace:Raycast(charModel.HumanoidRootPart.CFrame.Position,charModel.HumanoidRootPart.CFrame.UpVector*-1000,rtParams)
+			if rt then
+				local ForcePushDirectExp = TweenInfo.new(
+					rt.Distance/150,
+					Enum.EasingStyle.Sine,
+					Enum.EasingDirection.In,
+					0,
+					false,
+					0
+				)
+				charModel.HumanoidRootPart.CFrame = CFrame.lookAt(charModel.HumanoidRootPart.CFrame.Position,rt.Position)
+				charModel.HumanoidRootPart.CFrame *= CFrame.fromAxisAngle(charModel.HumanoidRootPart.CFrame.UpVector,math.rad(180))
+				local slamCF = charModel.HumanoidRootPart.CFrame + charModel.HumanoidRootPart.CFrame.LookVector * (-rt.Distance + 0.5)
+				local slamTween = TweenService:Create(charModel.HumanoidRootPart,ForcePushDirectExp,{CFrame = slamCF})
+				slamTween:Play()
+				local hitSound = Novus.Global.AudioFolderReference.WallHit:Clone()
+				hitSound.Parent = charModel.HumanoidRootPart
+				slamTween.Completed:Wait()
+				hitSound:Play()
+				Novus.Global.doDamageToHumanoid(charModel.Humanoid,dV.forceHeavySlamDamage,false,dV.forceHeavySlamDecayDamage)
+				cs.Mesh.TextureId = cs.Free.Value
+				local ind2 = cs:Clone()
+				ind2.Parent = charModel.HumanoidRootPart
+				ind2.Anchored = true
+				local indCF2 = TweenService:Create(ind2.Mesh,TI.SoulChangeIndicate,{Scale = Vector3.new(ind2.Mesh.Scale.X*2,ind2.Mesh.Scale.Y*2,ind2.Mesh.Scale.Z*2)})
+				local indFade = TweenService:Create(ind2,TI.SoulChangeIndicate,{Transparency = 1})
+				local csFade = TweenService:Create(cs,TI.SoulChangeIndicate,{Transparency = 1})
+				scSound:Play()
+				indCF2:Play()
+				indFade:Play()
+				task.spawn(function()
+					indCF2.Completed:Wait()
+					ind2:Destroy()
+					csFade:Play()
+				end)
+				charModel.HumanoidRootPart.Anchored = false
+				task.spawn(function()
+					csFade.Completed:Wait()
+					cs:Destroy()
+				end)
+				task.wait(2)
+				charModel.Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+			elseif rt == nil then
+				return false,warn("Downwards raycast failure. Cause unknown.")
+			end
+		end
+	elseif Hit ~= nil and Origin ~= nil then
+		local rtParams = RaycastParams.new()
+		rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+		rtParams.RespectCanCollide = false
+		rtParams.IgnoreWater = true
+		local wlTbl = {}
+		for i,v:Instance in pairs(workspace:GetDescendants()) do
+			if v:IsA("BasePart") and v.Parent:IsA("Model") and v.Parent:FindFirstChild("Humanoid") and game.Players:GetPlayerFromCharacter(v.Parent) ~= Novus.Global.UserPlayer and v.Parent.Humanoid.Health > 0 then
+				table.insert(wlTbl,v)
+			end
+		end
+		rtParams.FilterDescendantsInstances = wlTbl
+		local rtresult = workspace:Blockcast(Origin,Vector3.new(20,20,1),(Hit.Position-Origin.Position).Unit*dV.forceEffectRange,rtParams)
+		if rtresult ~= nil and rtresult.Instance.Parent.Humanoid.Health > 0 then
+			local Target2 = rtresult.Instance
+			if (plr.Character.HumanoidRootPart.Position-Target2:FindFirstAncestorWhichIsA("Model").HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
 				local animator = Instance.new("Animator")
 				animator.Parent = plr.Character.Humanoid
 				local aniTrack:AnimationTrack = animator:LoadAnimation(dV.forceSlamAnim)
 				local isFired = false
 				local cs = Novus.Global.ModelFolderReference.CoilSoul:Clone()
-				local charModel = Target:FindFirstAncestorWhichIsA("Model")
+				local charModel = Target2:FindFirstAncestorWhichIsA("Model")
 				cs.Parent = charModel
 				cs.CFrame = charModel.HumanoidRootPart.CFrame
 				cs.CFrame += (cs.CFrame.RightVector * -3) + (cs.CFrame.UpVector * 1.75)
