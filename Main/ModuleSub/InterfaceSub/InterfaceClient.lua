@@ -209,6 +209,7 @@ loadButton.MouseButton1Click:Once(function()
 			end
 		end)
 		local conn = UIS.InputBegan:Connect(function (input,isProcessed)
+			local rootPos = plr.Character.PrimaryPart.Position
 			if not isProcessed and not modeSwitchDB then --Added a reference to the debounce for switching modes so you don't accidentally use moves from a different mode while switching... if you have lag. -shooter7620
 				if input.KeyCode == Enum.KeyCode.Q then
 					if not modeSwitchDB then
@@ -270,7 +271,22 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move1,v)
 								end
 							elseif currentMode == "Telekinesis" then
-								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 100 then
+								if (mouse.Hit.Position-rootPos).Magnitude > 100 then
+									return false
+								end
+								local rtParams = RaycastParams.new()
+								rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+								rtParams.RespectCanCollide = false
+								rtParams.IgnoreWater = true
+								local wlTbl = {}
+								for i,v:Instance in pairs(workspace:GetDescendants()) do
+									if v:IsA("BasePart") and v.Parent:IsA("Model") and v.Parent:FindFirstChild("Humanoid") and game.Players:GetPlayerFromCharacter(v.Parent) ~= plr and v.Parent.Humanoid.Health > 0 then
+										table.insert(wlTbl,v)
+									end
+								end
+								rtParams.FilterDescendantsInstances = wlTbl
+								local rtresult = workspace:Blockcast(mouse.Origin,Vector3.new(20,20,1),(mouse.Hit.Position-mouse.Origin.Position).Unit*100,rtParams)
+								if rtresult == nil then
 									return false
 								end
 								local b,rm:RemoteEvent = script.Parent.RequestRemote:InvokeServer("TKSusp")
@@ -288,7 +304,7 @@ loadButton.MouseButton1Click:Once(function()
 									end
 									script.Parent.RemoveRemote:InvokeServer(rm)
 								end)
-								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Target,rm)
+								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Target,rm,mouse.Hit,mouse.Origin)
 								if s then
 									createAnimCDUI(slots.Move1,v)
 								end
@@ -304,7 +320,7 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move2,v)
 								end
 							elseif currentMode == "Sword" then
-								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 500 then
+								if (mouse.Hit.Position-rootPos).Magnitude > 500 then
 									return false
 								end
 								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.UnitRay)
@@ -312,10 +328,25 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move2,v)
 								end
 							elseif currentMode == "Telekinesis" then
-								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 100 then
+								if (mouse.Hit.Position-rootPos).Magnitude > 100 then
 									return false
 								end
-								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Target)
+								local rtParams = RaycastParams.new()
+								rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+								rtParams.RespectCanCollide = false
+								rtParams.IgnoreWater = true
+								local wlTbl = {}
+								for i,v:Instance in pairs(workspace:GetDescendants()) do
+									if v:IsA("BasePart") and v.Parent:IsA("Model") and v.Parent:FindFirstChild("Humanoid") and game.Players:GetPlayerFromCharacter(v.Parent) ~= plr and v.Parent.Humanoid.Health > 0 then
+										table.insert(wlTbl,v)
+									end
+								end
+								rtParams.FilterDescendantsInstances = wlTbl
+								local rtresult = workspace:Blockcast(mouse.Origin,Vector3.new(20,20,1),(mouse.Hit.Position-mouse.Origin.Position).Unit*100,rtParams)
+								if rtresult == nil then
+									return false
+								end
+								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Target,mouse.Hit,mouse.Origin)
 								if s then
 									createAnimCDUI(slots.Move2,v)
 								end
@@ -343,7 +374,7 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move3,v)
 								end
 							elseif currentMode == "Sword" then
-								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 500 then
+								if (mouse.Hit.Position-rootPos).Magnitude > 500 then
 									return false
 								end
 								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.UnitRay)
@@ -351,7 +382,7 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move3,v)
 								end
 							elseif currentMode == "Telekinesis" then
-								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Target)
+								local s,v = script.Parent.UseMove:InvokeServer(i)
 								if s then
 									createAnimCDUI(slots.Move3,v)
 								end
@@ -423,7 +454,7 @@ loadButton.MouseButton1Click:Once(function()
 									createAnimCDUI(slots.Move6,v)
 								end
 							elseif currentMode == "Sword" then
-								if (mouse.Hit.Position-mouse.Origin.Position).Magnitude > 500 then
+								if (mouse.Hit.Position-rootPos).Magnitude > 500 then
 									return false
 								end
 								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.Target,mouse.UnitRay)
