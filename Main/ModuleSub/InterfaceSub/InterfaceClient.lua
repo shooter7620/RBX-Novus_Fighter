@@ -275,7 +275,7 @@ loadButton.MouseButton1Click:Once(function()
 									return false
 								end
 								local rtParams = RaycastParams.new()
-								rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+								rtParams.FilterType = Enum.RaycastFilterType.Include
 								rtParams.RespectCanCollide = false
 								rtParams.IgnoreWater = true
 								local wlTbl = {}
@@ -285,7 +285,7 @@ loadButton.MouseButton1Click:Once(function()
 									end
 								end
 								rtParams.FilterDescendantsInstances = wlTbl
-								local rtresult = workspace:Blockcast(mouse.Origin,Vector3.new(20,20,1),(mouse.Hit.Position-mouse.Origin.Position).Unit*100,rtParams)
+								local rtresult = workspace:Blockcast(mouse.Origin,Vector3.new(20,20,1),(mouse.Hit.Position-mouse.Origin.Position).Unit*(100+math.abs((plr.Character.PrimaryPart.Position-mouse.Origin.Position).Magnitude)),rtParams)
 								if rtresult == nil then
 									return false
 								end
@@ -332,7 +332,7 @@ loadButton.MouseButton1Click:Once(function()
 									return false
 								end
 								local rtParams = RaycastParams.new()
-								rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+								rtParams.FilterType = Enum.RaycastFilterType.Include
 								rtParams.RespectCanCollide = false
 								rtParams.IgnoreWater = true
 								local wlTbl = {}
@@ -342,7 +342,7 @@ loadButton.MouseButton1Click:Once(function()
 									end
 								end
 								rtParams.FilterDescendantsInstances = wlTbl
-								local rtresult = workspace:Blockcast(mouse.Origin,Vector3.new(20,20,1),(mouse.Hit.Position-mouse.Origin.Position).Unit*100,rtParams)
+								local rtresult = workspace:Blockcast(mouse.Origin,Vector3.new(20,20,1),(mouse.Hit.Position-mouse.Origin.Position).Unit*(100+math.abs((plr.Character.PrimaryPart.Position-mouse.Origin.Position).Magnitude)),rtParams)
 								if rtresult == nil then
 									return false
 								end
