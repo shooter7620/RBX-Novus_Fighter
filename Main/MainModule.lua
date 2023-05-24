@@ -625,7 +625,7 @@ Novus.Moves = {
 		end
 		local TargetCF
 		local rtParams = RaycastParams.new()
-		rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+		rtParams.FilterType = Enum.RaycastFilterType.Exclude
 		local blTbl = {}
 		for i,v in ipairs(game.Workspace:GetDescendants()) do
 			if v.Parent:FindFirstChild("Humanoid") ~= nil then
@@ -633,7 +633,7 @@ Novus.Moves = {
 			end
 		end
 		rtParams.FilterDescendantsInstances = blTbl
-		local rtResult = workspace:Raycast(plrCameraOrigin.Position,plrMouseRay.Direction*Novus.Variables.BlasterRange,rtParams)
+		local rtResult = workspace:Raycast(plrCameraOrigin.Position,plrMouseRay.Direction*(Novus.Variables.BlasterRange+math.abs((Novus.Global.UserPlayer.Character.PrimaryPart.Position-plrCameraOrigin.Position).Magnitude)),rtParams)
 		if rtResult ~= nil then
 			TargetCF = CFrame.new(rtResult.Position)
 		else
@@ -665,7 +665,7 @@ Novus.Moves = {
 		local OLP = OverlapParams.new()
 		OLP.RespectCanCollide = false
 		OLP.MaxParts = 0
-		OLP.FilterType = Enum.RaycastFilterType.Whitelist
+		OLP.FilterType = Enum.RaycastFilterType.Include
 		local blTbl = {}
 		for i,v in pairs(workspace:GetChildren()) do
 			if v:FindFirstChild("Humanoid") ~= nil and v ~= Novus.Global.UserPlayer.Character and v:FindFirstChild("Humanoid").Health ~= 0 then
@@ -705,7 +705,7 @@ Novus.Moves = {
 		local OLP = OverlapParams.new()
 		OLP.RespectCanCollide = false
 		OLP.MaxParts = 0
-		OLP.FilterType = Enum.RaycastFilterType.Blacklist
+		OLP.FilterType = Enum.RaycastFilterType.Exclude
 		local blTbl = {}
 		for i,v in pairs(workspace:GetChildren()) do
 			if v:FindFirstChild("Humanoid") == nil or v == Novus.Global.UserPlayer.Character or v:FindFirstChild("Humanoid").Health == 0 then
@@ -754,7 +754,7 @@ Novus.Moves = {
 			end
 			local TargetCF
 			local rtParams = RaycastParams.new()
-			rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+			rtParams.FilterType = Enum.RaycastFilterType.Exclude
 			local blTbl = {}
 			for i,v in ipairs(game.Workspace:GetDescendants()) do
 				if v.Parent:FindFirstChild("Humanoid") ~= nil then
@@ -1063,7 +1063,7 @@ function Novus.Global.doDamageWithPart(refPart:Part,dmg:number,decayDmg:number,i
 	local OLP = OverlapParams.new()
 	OLP.RespectCanCollide = false
 	OLP.MaxParts = 0
-	OLP.FilterType = Enum.RaycastFilterType.Blacklist
+	OLP.FilterType = Enum.RaycastFilterType.Exclude
 	local blTbl = {}
 	for i,v in pairs(workspace:GetChildren()) do
 		if v:FindFirstChild("Humanoid") == nil or v == Novus.Global.UserPlayer.Character then
@@ -1113,7 +1113,7 @@ function Novus.Global.doDamageWithZone(refCF:CFrame,refSize:Vector3,dmg:number,d
 	local OLP = OverlapParams.new()
 	OLP.RespectCanCollide = false
 	OLP.MaxParts = 0
-	OLP.FilterType = Enum.RaycastFilterType.Blacklist
+	OLP.FilterType = Enum.RaycastFilterType.Exclude
 	local blTbl = {}
 	for i,v in pairs(workspace:GetChildren()) do
 		if v:FindFirstChild("Humanoid") == nil or v == Novus.Global.UserPlayer.Character then
@@ -1737,7 +1737,7 @@ function Novus.Global.Blasters.BlasterDefense(plr:Player,radius:number,duration:
 	local defDelayTbl = {}
 	local OLP = OverlapParams.new()
 	OLP.RespectCanCollide = false
-	OLP.FilterType = Enum.RaycastFilterType.Whitelist
+	OLP.FilterType = Enum.RaycastFilterType.Include
 	local ct = tick()
 	while tick()-ct <= duration do
 		local charCF = plr.Character.PrimaryPart.CFrame
@@ -1948,11 +1948,11 @@ function Novus.Global.Swords.summonKatanaZoneGlobal(cameraOrigin:CFrame,targetRa
 			end
 		end
 	end
-	rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rtParams.FilterType = Enum.RaycastFilterType.Exclude
 	rtParams.IgnoreWater = true
 	rtParams.RespectCanCollide = true
 	rtParams.FilterDescendantsInstances = blTable
-	local rtResult = workspace:Raycast(cameraOrigin.Position,targetRay.Direction*dV.SwordRange,rtParams)
+	local rtResult = workspace:Raycast(cameraOrigin.Position,targetRay.Direction*(dV.SwordRange+math.abs((Novus.Global.UserPlayer.Character.PrimaryPart.Position-cameraOrigin.Position).Magnitude)),rtParams)
 	if zoneType == "Normal" then
 		if rtResult ~= nil then
 			local targetCF = CFrame.new(rtResult.Position)
@@ -2406,7 +2406,7 @@ function Novus.Global.Force.forcePushDirectional(plr:Player,hm:Humanoid,mousePos
 	local initPointerCF = hmPointCF + hmPointCF.LookVector * -1
 	hmPointCF = CFrame.lookAt(hmPointCF.Position,initPointerCF.Position)
 	local ifHitParams = RaycastParams.new()
-	ifHitParams.FilterType = Enum.RaycastFilterType.Blacklist
+	ifHitParams.FilterType = Enum.RaycastFilterType.Exclude
 	local blTbl = {}
 	for i,v in pairs(workspace:GetDescendants()) do
 		if v.Parent:FindFirstChild("Humanoid") ~= nil then
@@ -2636,7 +2636,7 @@ function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:Remote
 		end
 	elseif Hit ~= nil and Origin ~= nil then --This uses a shapecast so it doesn't fail if your cursor is just shy of a target... neat.
 		local rtParams = RaycastParams.new()
-		rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+		rtParams.FilterType = Enum.RaycastFilterType.Include
 		rtParams.RespectCanCollide = false
 		rtParams.IgnoreWater = true
 		local wlTbl = {}
@@ -2646,7 +2646,7 @@ function Novus.Global.Force.forceHold(plr:Player,Target:BasePart,CFRemote:Remote
 			end
 		end
 		rtParams.FilterDescendantsInstances = wlTbl
-		local rtresult = workspace:Blockcast(Origin,Vector3.new(20,20,1),(Hit.Position-Origin.Position).Unit*dV.forceEffectRange,rtParams)
+		local rtresult = workspace:Blockcast(Origin,Vector3.new(20,20,1),(Hit.Position-Origin.Position).Unit*(dV.forceEffectRange+math.abs((Novus.Global.UserPlayer.Character.PrimaryPart.Position-Origin.Position).Magnitude)),rtParams)
 		if rtresult ~= nil and rtresult.Instance.Parent.Humanoid.Health > 0 then
 			local Target2 = rtresult.Instance
 			if (plr.Character.HumanoidRootPart.Position-Target2.Parent.HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
@@ -2808,11 +2808,11 @@ function Novus.Global.Force.ForceSlam(plr,Target:BasePart,Hit:CFrame,Origin:CFra
 					end
 				end
 			end
-			rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+			rtParams.FilterType = Enum.RaycastFilterType.Exclude
 			rtParams.IgnoreWater = true
 			rtParams.RespectCanCollide = true
 			rtParams.FilterDescendantsInstances = blTable
-			local rt = workspace:Raycast(charModel.HumanoidRootPart.CFrame.Position,charModel.HumanoidRootPart.CFrame.UpVector*-1000,rtParams)
+			local rt = workspace:Raycast(charModel.HumanoidRootPart.CFrame.Position,charModel.HumanoidRootPart.CFrame.UpVector*(-1000+(-1*math.abs((Novus.Global.UserPlayer.Character.PrimaryPart.Position-Origin.Position).Magnitude))),rtParams)
 			if rt then
 				local ForcePushDirectExp = TweenInfo.new(
 					rt.Distance/150,
@@ -2860,7 +2860,7 @@ function Novus.Global.Force.ForceSlam(plr,Target:BasePart,Hit:CFrame,Origin:CFra
 		end
 	elseif Hit ~= nil and Origin ~= nil then
 		local rtParams = RaycastParams.new()
-		rtParams.FilterType = Enum.RaycastFilterType.Whitelist
+		rtParams.FilterType = Enum.RaycastFilterType.Include
 		rtParams.RespectCanCollide = false
 		rtParams.IgnoreWater = true
 		local wlTbl = {}
@@ -2870,7 +2870,7 @@ function Novus.Global.Force.ForceSlam(plr,Target:BasePart,Hit:CFrame,Origin:CFra
 			end
 		end
 		rtParams.FilterDescendantsInstances = wlTbl
-		local rtresult = workspace:Blockcast(Origin,Vector3.new(20,20,1),(Hit.Position-Origin.Position).Unit*dV.forceEffectRange,rtParams)
+		local rtresult = workspace:Blockcast(Origin,Vector3.new(20,20,1),(Hit.Position-Origin.Position).Unit*(dV.forceEffectRange+math.abs((Novus.Global.UserPlayer.Character.PrimaryPart.Position-Origin.Position).Magnitude)),rtParams)
 		if rtresult ~= nil and rtresult.Instance.Parent.Humanoid.Health > 0 then
 			local Target2 = rtresult.Instance
 			if (plr.Character.HumanoidRootPart.Position-Target2:FindFirstAncestorWhichIsA("Model").HumanoidRootPart.Position).Magnitude <= dV.forceEffectRange then
@@ -2933,7 +2933,7 @@ function Novus.Global.Force.ForceSlam(plr,Target:BasePart,Hit:CFrame,Origin:CFra
 						end
 					end
 				end
-				rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+				rtParams.FilterType = Enum.RaycastFilterType.Exclude
 				rtParams.IgnoreWater = true
 				rtParams.RespectCanCollide = true
 				rtParams.FilterDescendantsInstances = blTable
@@ -3001,11 +3001,11 @@ function Novus.Global.Force.Repulse(plr:Player)
 			table.insert(hmBlTbl,v)
 		end
 	end
-	OL.FilterType = Enum.RaycastFilterType.Blacklist
+	OL.FilterType = Enum.RaycastFilterType.Exclude
 	OL.FilterDescendantsInstances = hmBlTbl
 	local partTbl = workspace:GetPartBoundsInRadius(charCF.Position,dV.groupForceEffectRange,OL)
 	local rtParams = RaycastParams.new()
-	rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rtParams.FilterType = Enum.RaycastFilterType.Exclude
 	local blTbl = {}
 	for i,v in ipairs(game.Workspace:GetDescendants()) do
 		if v.Parent:FindFirstChild("Humanoid") ~= nil then
@@ -3147,7 +3147,7 @@ function Novus.Global.Blasters.UseBlasterCircle(plr,repeats,mouseOrigin,Target,m
 	end
 	local TargetCF
 	local rtParams = RaycastParams.new()
-	rtParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rtParams.FilterType = Enum.RaycastFilterType.Exclude
 	local blTbl = {}
 	for i,v in ipairs(game.Workspace:GetDescendants()) do
 		if v.Parent:FindFirstChild("Humanoid") ~= nil then
@@ -3155,7 +3155,7 @@ function Novus.Global.Blasters.UseBlasterCircle(plr,repeats,mouseOrigin,Target,m
 		end
 	end
 	rtParams.FilterDescendantsInstances = blTbl
-	local rtResult = workspace:Raycast(mouseOrigin.Position,mouseRay.Direction*1000,rtParams)
+	local rtResult = workspace:Raycast(mouseOrigin.Position,mouseRay.Direction*(1000+math.abs(Novus.Global.UserPlayer.Character.PrimaryPart.Position-mouseOrigin.Position)),rtParams)
 	if rtResult ~= nil then
 		TargetCF = CFrame.new(rtResult.Position)
 	else
@@ -3185,7 +3185,7 @@ function Novus.Global.Universal.Blink(plr:Player,mouseHit:CFrame)
 	local OLP = OverlapParams.new()
 	OLP.RespectCanCollide = false
 	OLP.MaxParts = 0
-	OLP.FilterType = Enum.RaycastFilterType.Blacklist
+	OLP.FilterType = Enum.RaycastFilterType.Exclude
 	local blTbl = {}
 	for i,v in pairs(workspace:GetChildren()) do
 		if v:FindFirstChild("Humanoid") ~= nil then
