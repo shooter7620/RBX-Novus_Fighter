@@ -591,29 +591,30 @@ Novus.Moves = {
 			Novus.Global.moveCDTbl["Revolving_Rail_Blasters"][5] = false
 		end)
 	end,false,{"Rail_Blaster","Large_Rail_Blaster","Revolving_Rail_Blasters","Homing_Blasters","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage.."/tick (per blaster)",desc = "Sequentially summons three pairs of two Rail Blasters that fire one after another with a short delay."}},
-	--[[Rail_Blaster_Fusillade = {"Rail Blaster Fusillade",10,"Blaster",9,function (plr:Player,targetCF:CFrame)
+	--[[Rail_Blaster_Fusillade = {"Rail Blaster Fusillade",10,"Blaster",7,function (plr:Player,targetCF:CFrame)
 		if plr ~= Novus.Global.UserPlayer then
 			plr:Kick("Illegal remote access detected (fired a remote which is not permitted to be used by other players).")
 			return false
 		end
+		local rh = Random.new():NextNumber(1,4)
 		local charCF = plr.Character.HumanoidRootPart.CFrame
 		local vectorToCFR = CFrame.lookAt(charCF.Position,targetCF.Position)
-		vectorToCFR = vectorToCFR + (vectorToCFR.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCFR.RightVector * (math.random(17,27))) + (vectorToCFR.UpVector * (math.random(1,4) * 7))
+		vectorToCFR = vectorToCFR + (vectorToCFR.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCFR.RightVector * (math.random(17,27))) + (vectorToCFR.UpVector * (rh * 7))
 		local beginCFR = vectorToCFR + vectorToCFR.LookVector * -56.25
 		local vectorToCFL = CFrame.lookAt(charCF.Position,targetCF.Position)
-		vectorToCFL = vectorToCFL + (vectorToCFL.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCFL.RightVector * (-1 * math.random(17,27))) + (vectorToCFL.UpVector * (math.random(1,4) * 7))
+		vectorToCFL = vectorToCFL + (vectorToCFL.LookVector * (math.random(1.05,1.35) * 5.25)) + (vectorToCFL.RightVector * (-1 * math.random(17,27))) + (vectorToCFL.UpVector * (rh * 7))
 		local beginCFL = vectorToCFL + vectorToCFL.LookVector * -56.25
-		local vectorToCFR2,vectorToCFR3 = vectorToCFR + (vectorToCFR.RightVector * 5),vectorToCFR + (vectorToCFR.RightVector * 10)
-		local beginCFR2,beginCFR3 = vectorToCFR2 + (vectorToCFR2.LookVector * -56.25),vectorToCFR3 + (vectorToCFR3.LookVector * -56.25)
-		local vectorToCFL2,vectorToCFL3 = vectorToCFL + (vectorToCFL.RightVector * -5),vectorToCFL + (vectorToCFL.RightVector * -10)
-		local beginCFL2,beginCFL3 = vectorToCFL2 + (vectorToCFL2.LookVector * -56.25),vectorToCFL3 + (vectorToCFL3.LookVector * -56.25)
+		local vectorToCFR2,vectorToCFR3 = vectorToCFR + (vectorToCFR.RightVector * 5) + (vectorToCFR.UpVector * -5),vectorToCFR + (vectorToCFR.RightVector * 10) + (vectorToCFR.UpVector * -10)
+		local beginCFR2,beginCFR3 = vectorToCFR2 + (vectorToCFR2.LookVector * -56.25) + (vectorToCFR2.UpVector * -5),vectorToCFR3 + (vectorToCFR3.LookVector * -56.25) + (vectorToCFR3.UpVector * -10)
+		local vectorToCFL2,vectorToCFL3 = vectorToCFL + (vectorToCFL.RightVector * -5) + (vectorToCFL.UpVector * -5),vectorToCFL + (vectorToCFL.RightVector * -10) + (vectorToCFL.UpVector * -10)
+		local beginCFL2,beginCFL3 = vectorToCFL2 + (vectorToCFL2.LookVector * -56.25) + (vectorToCFL2.UpVector * -5),vectorToCFL3 + (vectorToCFL3.LookVector * -56.25) + (vectorToCFL3.UpVector * -10)
 		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFR,vectorToCFR,targetCF,"Medium",false)
 		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFL,vectorToCFL,targetCF,"Medium",false)
 		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFR2,vectorToCFR2,targetCF,"Medium",false)
 		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFR3,vectorToCFR3,targetCF,"Medium",false)
 		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFL2,vectorToCFL2,targetCF,"Medium",false)
 		task.spawn(Novus.Global.Blasters.SummonBlasterExp,beginCFL3,vectorToCFL3,targetCF,"Medium",false) --...
-	end,false,{"Rail_Blaster","Large_Rail_Blaster","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage,desc = "Summons six blasters in a formation that shoot towards the cursor."}}]]
+	end,false,{"Rail_Blaster","Large_Rail_Blaster","Blaster_Barrage","Blaster_Circle","Rail_Blaster_Defense"},{dmg = Novus.Variables.mediumTickDamage.."/tick (per blaster)",decayDmg = Novus.Variables.mediumDecayDamage,desc = "Summons six blasters in a formation that shoot towards the cursor."}},]]
 	--Will probably add the above in as a replacement for "Revolving Rail Blasters" if I don't find a way to fix the current bug with that move.
 	Quad_Rail_Blasters = {"Quad Rail Blasters",8,"Blaster",4,function (plr:Player,plrCameraOrigin:CFrame,plrMouseTarget:BasePart,plrMouseRay:Ray)
 		if plr ~= Novus.Global.UserPlayer then
