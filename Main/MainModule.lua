@@ -3155,7 +3155,7 @@ function Novus.Global.Blasters.UseBlasterCircle(plr,repeats,mouseOrigin,Target,m
 		end
 	end
 	rtParams.FilterDescendantsInstances = blTbl
-	local rtResult = workspace:Raycast(mouseOrigin.Position,mouseRay.Direction*(1000+math.abs(Novus.Global.UserPlayer.Character.PrimaryPart.Position-mouseOrigin.Position).Magnitude),rtParams)
+	local rtResult = workspace:Raycast(mouseOrigin.Position,mouseRay.Direction*(1000+math.abs((Novus.Global.UserPlayer.Character.PrimaryPart.Position-mouseOrigin.Position.Magnitude))),rtParams)
 	if rtResult ~= nil then
 		TargetCF = CFrame.new(rtResult.Position)
 	else
