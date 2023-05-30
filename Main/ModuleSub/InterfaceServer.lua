@@ -177,8 +177,8 @@ local function initMove(plr:Player,moveName:string,...)
 						end
 					end
 				end
-				task.spawn(moveDictionary[5],table.unpack(argsTuple))
 				moveCDTbl[moveName] = {true,moveDictionary[2],moveDictionary[6],moveDictionary[7],true}
+				task.spawn(moveDictionary[5],table.unpack(argsTuple))
 				rmDB = false
 				return true,moveDictionary[2]
 			else
