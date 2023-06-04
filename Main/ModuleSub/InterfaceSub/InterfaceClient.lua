@@ -457,7 +457,7 @@ loadButton.MouseButton1Click:Once(function()
 								if (mouse.Hit.Position-rootPos).Magnitude > 500 then
 									return false
 								end
-								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.Target,mouse.UnitRay)
+								local s,v = script.Parent.UseMove:InvokeServer(i,mouse.Origin,mouse.UnitRay)
 								if s then
 									createAnimCDUI(slots.Move6,v)
 								end
